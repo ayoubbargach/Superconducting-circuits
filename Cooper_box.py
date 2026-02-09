@@ -119,5 +119,4 @@ fig.suptitle(
 )
 
 plt.savefig("figure.png", dpi=200, bbox_inches="tight")
-plt.savefig("figure.pdf", bbox_inches="tight")
 print("Figure saved.")

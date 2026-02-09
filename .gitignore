@@ -1,6 +1,5 @@
 # Generated figures
 *.pdf
-*.png
 
 # Python cache
 __pycache__/
