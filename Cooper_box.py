@@ -77,7 +77,7 @@ def compute_spectrum(n_g_array, EJ_over_EC, n_levels=5, n_max=30):
 
 # ---------- Parameters ----------
 n_g_array = np.linspace(-2, 2, 500)
-n_levels = 5
+n_levels = 7
 
 # The four panels of Figure 17
 EJ_EC_values = [0.01, 1.0, 3.0, 10.0]
@@ -88,8 +88,8 @@ panel_labels = [
     r"(d) $E_J/E_C = 10.0$",
 ]
 
-# Colors matching typical PRX style
-colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"]
+# Colors matching typical PRX style (added 2 more colors)
+colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2"]
 
 # ---------- Plot ----------
 fig = plt.figure(figsize=(10, 9))
@@ -114,10 +114,10 @@ for idx, (EJ_EC, label) in enumerate(zip(EJ_EC_values, panel_labels)):
     ax.tick_params(labelsize=11)
 
 fig.suptitle(
-    "Fig. 17 — Energy levels of the Cooper-pair box / Transmon",
+    "Energy levels of the Cooper-pair box / Transmon",
     fontsize=14, y=0.98,
 )
 
-plt.savefig("fig17_cpb.png", dpi=200, bbox_inches="tight")
-plt.savefig("fig17_cpb.pdf", bbox_inches="tight")
+plt.savefig("figure.png", dpi=200, bbox_inches="tight")
+plt.savefig("figure.pdf", bbox_inches="tight")
 print("Figure saved.")
