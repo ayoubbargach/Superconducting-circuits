@@ -49,12 +49,30 @@ def build_hamiltonian(n_g, EJ_over_EC, n_max=30):
     return H
 
 
-def compute_spectrum(n_g_array, EJ_over_EC, n_levels=5, n_max=30):
+def compute_spectrum(n_g_array, EJ_over_EC, n_levels=5, n_max=30, normalize=True):
     """
     Compute the lowest energy levels as a function of n_g.
 
-    Returns energies normalized by E_01 = E_1 - E_0 at n_g = 0.5
-    (following the paper's convention for the y-axis).
+    Parameters
+    ----------
+    n_g_array : array
+        Array of gate charge values.
+    EJ_over_EC : float
+        Ratio E_J / E_C.
+    n_levels : int
+        Number of energy levels to compute.
+    n_max : int
+        Truncation parameter.
+    normalize : bool
+        If True, normalize energies by E_01 at n_g = 0.5 (paper convention).
+        If False, return raw energies in units of E_C (useful for convergence studies).
+
+    Returns
+    -------
+    energies : ndarray
+        Energy levels as a function of n_g.
+        If normalize=True: energies normalized by E_01 = E_1 - E_0 at n_g = 0.5.
+        If normalize=False: raw energies in units of E_C, shifted so ground state minimum is zero.
     """
     # Adjust n_levels if n_max is too small
     max_dim = 2 * n_max + 1
@@ -70,13 +88,13 @@ def compute_spectrum(n_g_array, EJ_over_EC, n_levels=5, n_max=30):
     # Shift so that ground state energy at n_g=0 is zero
     energies -= energies[:, 0].min()
 
-    # Normalize by E_01 at n_g closest to 0 (or 0.5 depending on convention)
-    # The paper normalizes by E_01. We use E_01 at the minimum gap point.
-    idx_half = np.argmin(np.abs(n_g_array - 0.5))
-    E01 = energies[idx_half, 1] - energies[idx_half, 0]
+    if normalize:
+        # Normalize by E_01 at n_g closest to 0.5 (paper convention)
+        idx_half = np.argmin(np.abs(n_g_array - 0.5))
+        E01 = energies[idx_half, 1] - energies[idx_half, 0]
 
-    if E01 > 1e-10:
-        energies /= E01
+        if E01 > 1e-10:
+            energies /= E01
 
     return energies
 
@@ -257,10 +275,10 @@ def analyze_cooper_box(results_dir='Results_Cooper_box'):
     plt.close('all')
     print("\nAll truncation comparison figures saved.")
 
-    # ---------- Plot 4: Energy levels vs truncation for fixed n_g = 0.5 ----------
-    print("\nGenerating convergence analysis plots...")
+    # ---------- Plot 4: Energy levels vs truncation for fixed n_g = 0.5 (UNNORMALIZED) ----------
+    print("\nGenerating convergence analysis plots (unnormalized)...")
     n_g_fixed = 0.5
-    truncation_range = np.arange(10, 101, 2)  # From 10 to 100 by steps of 2
+    truncation_range = np.arange(1, 21, 1)  # From 1 to 20 by steps of 1 - THIS IS THE KEY CHANGE
     # Choose 4 representative Ej/Ec values: charge regime, transition, transmon, deep transmon
     EJ_EC_convergence = [0.5, 1.0, 5.0, 20.0]
     n_levels_convergence = 10  # Track first 10 energy levels
@@ -282,7 +300,7 @@ def analyze_cooper_box(results_dir='Results_Cooper_box'):
             H = build_hamiltonian(n_g_fixed, EJ_EC, n_max)
             evals = np.linalg.eigvalsh(H)
 
-            # Store first n_levels_actual energy levels
+            # Store first n_levels_actual energy levels (RAW, no normalization)
             energies_vs_trunc[i, :n_levels_actual] = evals[:n_levels_actual]
             # Mark unavailable levels as NaN
             if n_levels_actual < n_levels_convergence:
@@ -291,10 +309,7 @@ def analyze_cooper_box(results_dir='Results_Cooper_box'):
         # Shift so ground state is at zero
         energies_vs_trunc -= np.nanmin(energies_vs_trunc[:, 0])
 
-        # Normalize by E_01 at largest truncation
-        E01_ref = energies_vs_trunc[-1, 1] - energies_vs_trunc[-1, 0]
-        if E01_ref > 1e-10:
-            energies_vs_trunc /= E01_ref
+        # NO NORMALIZATION - this is the key change!
 
         # Plot each energy level vs truncation
         for level in range(n_levels_convergence):
@@ -306,14 +321,17 @@ def analyze_cooper_box(results_dir='Results_Cooper_box'):
         highest_level = n_levels_convergence - 1
         min_val = np.nanmin(energies_vs_trunc[:, highest_level])
         max_val = np.nanmax(energies_vs_trunc[:, highest_level])
+        variation = max_val - min_val
+        rel_variation = (variation / max_val * 100) if max_val > 0 else 0
 
-        # Add text annotations for min and max values of highest level
-        ax.text(0.02, 0.98, f'E_{highest_level} Min: {min_val:.4f}\nE_{highest_level} Max: {max_val:.4f}',
+        # Add text annotations showing variation
+        ax.text(0.02, 0.98,
+                f'E_{highest_level} Min: {min_val:.4f} E_C\nE_{highest_level} Max: {max_val:.4f} E_C\nVariation: {variation:.4f} E_C ({rel_variation:.2f}%)',
                 transform=ax.transAxes, fontsize=9, verticalalignment='top',
                 bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
 
         ax.set_xlabel(r"$n_{max}$ (truncation)", fontsize=12)
-        ax.set_ylabel(r"$E / E_{01}$", fontsize=12)
+        ax.set_ylabel(r"$E$ (units of $E_C$)", fontsize=12)
         ax.set_title(f"$E_J/E_C = {EJ_EC}$", fontsize=13)
         ax.grid(True, alpha=0.3)
         ax.tick_params(labelsize=10)
@@ -321,14 +339,14 @@ def analyze_cooper_box(results_dir='Results_Cooper_box'):
             ax.legend(fontsize=8, ncol=2, loc='best')
 
     fig_conv.suptitle(
-        f"Energy level convergence vs truncation at $n_g = {n_g_fixed}$",
+        f"Energy level convergence vs truncation at $n_g = {n_g_fixed}$ (UNNORMALIZED)",
         fontsize=14, y=0.98,
     )
 
-    plt.savefig(f"{results_dir}/figure_convergence_vs_truncation.png", dpi=200, bbox_inches="tight")
-    print(f"Figure saved: {results_dir}/figure_convergence_vs_truncation.png")
+    plt.savefig(f"{results_dir}/figure_convergence_vs_truncation_unnormalized.png", dpi=200, bbox_inches="tight")
+    print(f"Figure saved: {results_dir}/figure_convergence_vs_truncation_unnormalized.png")
 
-    # ---------- Plot 5: Highest energy level only vs truncation (log scale) ----------
+    # ---------- Plot 5: Convergence error (log scale) showing exponential convergence ----------
     fig_conv_log = plt.figure(figsize=(12, 10))
     gs_conv_log = GridSpec(2, 2, hspace=0.35, wspace=0.3)
 
@@ -346,7 +364,7 @@ def analyze_cooper_box(results_dir='Results_Cooper_box'):
             H = build_hamiltonian(n_g_fixed, EJ_EC, n_max)
             evals = np.linalg.eigvalsh(H)
 
-            # Store first n_levels_actual energy levels
+            # Store first n_levels_actual energy levels (RAW, no normalization)
             energies_vs_trunc_log[i, :n_levels_actual] = evals[:n_levels_actual]
             # Mark unavailable levels as NaN
             if n_levels_actual < n_levels_convergence:
@@ -355,40 +373,47 @@ def analyze_cooper_box(results_dir='Results_Cooper_box'):
         # Shift so ground state is at zero
         energies_vs_trunc_log -= np.nanmin(energies_vs_trunc_log[:, 0])
 
-        # Normalize by E_01 at largest truncation
-        E01_ref = energies_vs_trunc_log[-1, 1] - energies_vs_trunc_log[-1, 0]
-        if E01_ref > 1e-10:
-            energies_vs_trunc_log /= E01_ref
+        # Plot absolute error from converged value (last n_max) for multiple levels
+        for level in range(0, n_levels_convergence, 2):  # Plot every other level to avoid clutter
+            E_converged = energies_vs_trunc_log[-1, level]
+            abs_error = np.abs(energies_vs_trunc_log[:, level] - E_converged)
 
-        # Plot only the highest energy level vs truncation
-        highest_level = n_levels_convergence - 1
-        ax.semilogy(truncation_range, energies_vs_trunc_log[:, highest_level],
-                    color=colors[highest_level % len(colors)],
-                    lw=2, marker='o', markersize=3, label=f'E_{highest_level}')
+            # Replace zeros with a small number to avoid log issues
+            abs_error = np.where(abs_error < 1e-14, 1e-14, abs_error)
 
-        # Find min and max values for the highest energy level
-        min_val = np.nanmin(energies_vs_trunc_log[:, highest_level])
-        max_val = np.nanmax(energies_vs_trunc_log[:, highest_level])
+            ax.semilogy(truncation_range, abs_error,
+                        color=colors[level % len(colors)],
+                        lw=1.5, marker='o', markersize=3, label=f'E_{level}')
 
-        # Add text annotations for min and max values
-        ax.text(0.02, 0.98, f'E_{highest_level} Min: {min_val:.4f}\nE_{highest_level} Max: {max_val:.4f}',
-                transform=ax.transAxes, fontsize=9, verticalalignment='top',
-                bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+        # Add machine precision line
+        ax.axhline(1e-10, color='red', linestyle='--', linewidth=1.5,
+                   label='Numerical precision', alpha=0.7)
+
+        # Find where ground state converges
+        E0_converged = energies_vs_trunc_log[-1, 0]
+        E0_error = np.abs(energies_vs_trunc_log[:, 0] - E0_converged)
+        converged_idx = np.argmax(E0_error < 1e-10)
+        if converged_idx > 0:
+            converged_nmax = truncation_range[converged_idx]
+            ax.axvline(converged_nmax, color='green', linestyle='--', linewidth=1.5,
+                       alpha=0.5, label=f'E_0 converged at n_max={converged_nmax}')
 
         ax.set_xlabel(r"$n_{max}$ (truncation)", fontsize=12)
-        ax.set_ylabel(r"$E / E_{01}$ (log scale)", fontsize=12)
+        ax.set_ylabel(r"$|E - E_{converged}|$ (units of $E_C$, log scale)", fontsize=12)
         ax.set_title(f"$E_J/E_C = {EJ_EC}$", fontsize=13)
+        ax.set_ylim(1e-14, 1e0)
         ax.grid(True, alpha=0.3, which='both')
         ax.tick_params(labelsize=10)
-        ax.legend(fontsize=10, loc='best')
+        if idx == 0:
+            ax.legend(fontsize=8, ncol=2, loc='best')
 
     fig_conv_log.suptitle(
-        f"Highest energy level (E_{n_levels_convergence-1}) convergence vs truncation at $n_g = {n_g_fixed}$ (log scale)",
+        f"Exponential convergence of energy levels vs truncation at $n_g = {n_g_fixed}$",
         fontsize=14, y=0.98,
     )
 
-    plt.savefig(f"{results_dir}/figure_convergence_vs_truncation_log.png", dpi=200, bbox_inches="tight")
-    print(f"Figure saved: {results_dir}/figure_convergence_vs_truncation_log.png")
+    plt.savefig(f"{results_dir}/figure_convergence_exponential.png", dpi=200, bbox_inches="tight")
+    print(f"Figure saved: {results_dir}/figure_convergence_exponential.png")
 
     plt.close('all')
     print("\nAll figures saved.")
