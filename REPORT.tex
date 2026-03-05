@@ -1,0 +1,1021 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{tcolorbox}
+\usepackage{setspace}
+%%%%%%%%%-- Gestion des espaces vides---%%%%%%%%%%%%%%
+\setlength{\textfloatsep}{6pt}
+\setlength{\intextsep}{6pt}
+\usepackage[skip=3pt]{caption}
+%--L'espaces entre les equations---%%%%%%%%%%%%
+\setlength{\abovedisplayskip}{6pt}
+\setlength{\belowdisplayskip}{6pt}
+\captionsetup{skip=3pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% --- Packages math ---
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+% --- Figures ---
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subcaption}
+
+% --- Mise en page ---
+\usepackage{geometry}
+\geometry{margin=2cm, top=2cm, bottom=2cm}
+%\setstretch{1.15}
+
+% --- Liens (toujours vers la fin) ---
+\usepackage[colorlinks=true, linkcolor=blue, urlcolor=blue]{hyperref}
+
+
+\title{ÉTUDE THÉORIQUE DES CIRCUITS SUPRACONDUCTEURS \\ Des fondamentaux aux applications}
+\author{BARGACH Ayoub , KEITA Bakary}
+
+
+
+
+\date{21 janvier 2026}
+
+
+
+
+
+\begin{document}
+
+\maketitle
+
+
+\begin{abstract}
+Ce rapport fournit une étude des circuits supraconducteurs, explorant les principes fondamentaux sous-jacents à la supraconductivité et l'effet Josephson. En partant des phénomènes quantiques macroscopiques qui régissent les matériaux supraconducteurs, nous développons systématiquement le cadre théorique nécessaire à la compréhension des dispositifs quantiques supraconducteurs modernes. Nous montrons comment la quantification des circuits, fondée sur le formalisme lagrangien et hamiltonien, permet de décrire la dynamique de jonctions Josephson individuelles puis de circuits plus complexes. Un accent particulier est mis sur l'architecture du SQUID-dc, du qubit transmon et BiSQUID. Cette étude sert d'exploration fondamentale du matériel quantique supraconducteur, fournissant les outils théoriques essentiels pour comprendre le traitement de l'information quantique sur les plateformes supraconductrices.
+\end{abstract}
+\newpage
+\tableofcontents
+\clearpage
+
+\section*{Introduction}
+
+La supraconductivité, découverte par Kamerlingh Onnes en 1911 lors de ses expériences sur le mercure à basse température, a d'abord été perçue comme une curiosité de laboratoire~: un matériau dont la résistance électrique s'annule en dessous d'une température critique. Il faudra attendre plus de deux décennies pour que Meissner et Ochsenfeld révèlent en 1933 que ce phénomène va bien au-delà de la conductivité parfaite, en mettant en évidence l'expulsion active du champ magnétique --- le diamagnétisme parfait. Cette découverte a fondamentalement changé la compréhension du phénomène et a motivé l'élaboration des premiers cadres théoriques, notamment les équations phénoménologiques des frères London qui ont introduit la notion de longueur de pénétration et posé les bases d'une électrodynamique propre aux supraconducteurs.
+
+Le tournant décisif dans la construction théorique survient en 1950, lorsque Ginzburg et Landau proposent une description de la transition supraconductrice fondée sur un paramètre d'ordre complexe, inscrivant le phénomène dans le cadre plus large de la théorie des transitions de phase. Puis, en 1957, deux avancées majeures viennent parachever cet édifice~: la théorie microscopique de Bardeen, Cooper et Schrieffer (dite théorie BCS), qui identifie la formation de paires d'électrons liés par l'interaction avec le réseau cristallin comme mécanisme fondamental de la supraconductivité (et les travaux d'Abrikosov sur les réseaux de vortex qui ne seront pas abordées dans ce rapport) qui établissent la distinction entre supraconducteurs de type-I et de type-II.
+
+Ces fondements théoriques, développés sur près d'un demi-siècle, ne sont pas restés cantonnés à la physique fondamentale. Comme le soulignent Brito \textit{et al.}~\cite{brito_tutorial_2026}, ils constituent le pont entre les phénomènes quantiques macroscopiques et l'architecture des dispositifs quantiques modernes. La cohérence quantique macroscopique décrite par la théorie BCS et la quantification du flux magnétique qui en découle sont les ingrédients essentiels qui ont rendu possible, des décennies plus tard, l'émergence des circuits quantiques supraconducteurs. Ces circuits, constitués de capacités, d'inductances, de lignes de transmission et de jonctions Josephson, forment ce que Krantz \textit{et al.}~\cite{krantz_quantum_2019} et Levenson-Falk et Shanto~\cite{levenson-falk_review_2024} décrivent comme des \og atomes artificiels \fg{}~: des systèmes macroscopiques, fabriqués par lithographie sur puce, dont les niveaux d'énergie quantifiés sont entièrement configurables par les paramètres du circuit. Contrairement aux systèmes quantiques naturels --- ions piégés, atomes ultrafroids, spins dans le silicium --- les qubits supraconducteurs tirent parti de cette physique mésoscopique, où des propriétés microscopiques comme le spectre d'énergie et les temps de cohérence dépendent de paramètres macroscopiques contrôlables~\cite{rasmussen_superconducting_2021}.
+
+Ce rapport va s'intéresser aux aspects théoriques de la supraconductivité puis au formalisme qui permet d'étudier les circuits supraconducteurs et l'informatique quantique.
+
+La structure de ce rapport est organisée comme suit : La section \ref{sec:theorie_supra} passe en revue la physique derrière la supraconductivité. La section \ref{sec:josephson} développe le formalisme autour des circuits à base de jonctions josephson, l'élément supraconducteur central de ces types de circuits. Les sections suivantes abordent des exemples concrets de circuits supraconducteurs. Pour chaque d'eux, une analyse numérique en sera faite pour en décrire le spectre. Enfin, la Section \ref{sec:conclusion} synthétise les résultats clés et discute des directions futures.
+
+% Section 1
+\newpage
+\input{theorie}
+
+% Section 2
+\section{Effet Josephson et circuits supraconducteurs}
+\label{sec:josephson}
+% ============================================================
+
+%Considérons un métal ordinaire capable de conduire du courant, au sein de celui-ci les charges de même signe se repoussent. Si parcouru par un courant, ce métal doit son caractère de  conducteur grâce aux électrons uniques ou célibataires qu'il possède. %La répulsion électron-électron fait qu'au passage du courant le métal résiste, cela crée des pertes d'énergie par effet joule. 
+%Cependant si nous maintenons ce même métal en dessous d'une certaine température appelée température critique, les électrons ne se repoussent plus, ils s'apparient on appelle alors ces deux électrons ``paire de Cooper''  et le métal est alors un ``Supraconducteur''.
+\subsection{Description de la jonction Josephson}
+Supposons un métal supraconducteur à très basse température où se forme des paires de Cooper qui assurent sa conductivité idéale d'après la théorie BCS. 
+
+
+%La supraconduction est la capacité de certain type de métal à conduire du courant en dessous d'une certaine température, c'est le conducteur idéal (conduit parfaitement sans résistance). 
+
+Nous pouvons choisir de mettre ensemble deux matériaux supraconducteurs A et B séparés par un isolant, avec respectivement $N_A$ et $N_B$ comme nombre de pairs de Cooper en A et B, l'ensemble A-Isolant-B constitue une jonction (appelée Jonction Josephson). Le courant peut donc passer d'un supraconducteur à un autre à travers l'isolant (constituant une barrière de potentiel) par effet tunnel.  C'est l'effet Josephson.
+
+
+Étudions à présent le mécanisme de transfert de ces paires de Cooper, le nombre de pairs $N_A$, $N_B$ est spécifique à chaque matière, c'est des nombres propres. Prenons un entier relatif $m$, le nombre de paires ayant traversés par effet tunnel. Comme le nombre total de paires de Cooper de l'ensemble du système A et B doit être conservé on a alors l'égalité suivante :
+\begin{equation}
+|m\rangle=|N_A - m ; N_B + m\rangle.
+\end{equation}
+Ce $|m\rangle$ est un état discret dans lequel $m$ paires de Cooper sont passées à travers de la barrière de A vers B ou inversement avec un signe négatif. Ce passage est décrit par  l'Hamiltonien \cite{tuneling} définit dans la base orthonormée discrète $\{|m\rangle\}{m\in\mathbb{Z}}$ telle que:
+
+%%%%%%%%%%%%%%%%%%%equation du hamiltonien tunnel
+\begin{equation}
+\hat H_T
+= -\frac{E_J}{2}\sum_m
+\Big(
+|m\rangle\langle m+ n|
++ |m+n\rangle\langle m|
+\Big).
+\label{eq:Ht}
+\end{equation}
+
+Comme la probabilité de traversée est très faible, on préfère l'Hamiltonien d'une seule paire de Cooper :
+
+
+%Lorsqu'une paire de Cooper traverse la barrière de $A$ vers $B$, nous avons $m+1$ paires dans $B$, ce processus a eu lieu dans les deux sens ie on a $m-1$ paires dans $A$. Nous ne tiendrons compte que des cas isolés d'un seul supraconducteur. Le cas isolé de $B$ seul nous oblige à choir aussi la situation où une paire de Cooper quitterai $B$ vers $A$ ce qui est le contraire de la situation précédente. La généralisation de ces passages de l'autre côtés de la barrière jusqu'à l'ordre $n$ conduit à eq.\ref{eq:Hb} . Nous devons souligner que la probabilité pour qu'une paire de Cooper traverse la barrière est faible, les traversés d'ordre supérieur sont donc négligeable, alors le Hamiltonien du système se définit   à nouveau comme:
+
+\begin{equation}
+\hat H_T
+= -\frac{E_J}{2}\sum_m
+\Big(
+|m\rangle\langle m+ 1|
++ |m+1\rangle\langle m|
+\Big).
+\label{eq:Hb}
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% diagonalisation
+
+Par la suite, on diagonalise (\ref{eq:Hb}) à l'aide de la transformée de Fourier dans la base des phases $\theta$ voir (\ref{sec:diagonalisation}):
+\begin{equation}
+\hat H_T|\theta\rangle
+= -\frac{E_J}{2}
+\left(
+e^{i\theta} + e^{-i\theta}
+\right)
+\sum_m e^{im\theta}|m\rangle=-E_J\cos\theta \,|\theta\rangle.
+\label{eq:action4}
+\end{equation}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% détails de ces formules
+Jusqu’ici, la variable  $\theta$ est apparue uniquement comme la variable conjuguée de $m$, introduite par transformée de Fourier afin de diagonaliser l'Hamiltonien dans la base des états propres  $|\theta\rangle$. Au voisinage du zéro absolu, toute les particules constituant la matière se retrouvent condensées selon le ``condensat de Bose-Einstein ''. C'est comme si elles partageaient une seule phase à l'échelle macroscopique, physiquement $\theta$ représente cette phase pour chaque supraconducteur pris séparément. %Dans certains documents cette phase macroscopique est définie comme un opérateur qui agit dans l'espace de Hilbert sur la base des charges $m$ et aussi celui de la base des phases $\theta$.
+
+
+Pour chaque jonction Josephson, la traversée de la barrière s'effectue avec une certaine phase ``phase microscopique des paires de Cooper '' notée $\varphi= \theta_A -\theta_B$, où $\theta_A$ et $\theta_B$ représentent respectivement la phase macroscopique des supraconducteurs A et B.
+
+
+
+
+ \subsection{Circuit supraconducteur}
+ 
+ %Maintenant que nous avons introduit ce que signifie `` effet Josephson; supraconduction; jonction Josephson'' , essayons de comprendre un circuit supraconducteur. 
+ 
+ Un circuit supraconducteur est une association d'au moins un condensateur, une jonction Josephson et/ou une inductance. %Mais dans un cas minimaliste il peut se faire sans inductance puisque la  jonction Josephson est une forme d'inductance non linéaire.
+\begin{figure}[ht]
+\centering
+\includegraphics[width=9cm, height=7cm]{images/Josephson.png}
+\caption{Ici nous avons un exemple de référence de circuit supraconducteur comportant une inductance $L$, deux condensateurs de charge $C_1$ et $C_2$, deux jonctions Josephson l'ensemble est relié à la masse. Les flèches indiquent le sens d'évolution du circuit selon chaque branche , la branche principale est contient uniquement l'inductance et les deux jonctions. Chaque composant du circuit crée une tension notée $V_{C1}$, $V_{C2}$, $V_{EJ1}$, $V_{EJ2}$ et $V_{L}$.}
+\label{sec:ras}
+\end{figure}
+
+\subsection{Méthode de la détermination de l'équation différentielle}
+\label{sec:met}
+Le courant fournit par la jonction 1 crée un flux qui circule dans le même sens que la tension $V_{EJ1}$, de même le flux dû au courant $I_{C1}$ du condensateur circule dans le même sens que la tension $V_{C1}$ voir Fig~\ref{sec:p} (a). Compte tenu de l'évolution du circuit (sens anti-horaire), on obtient comme flux de branche eq.\ref{sec:a}. Dans la deuxième maille on tient le même raisonnement on trouve eq.\ref{sec:b}.
+
+Nous allons à présent considérer le boucle de courant passant par l'ensemble du circuit (toujours dans le sens anti-horaire). Il existe un flux extérieur $\tilde{\Phi}$ dans le circuit qui provient du courant extérieur. Il  est la somme des flux crées par les deux supraconducteurs et celui du flux induit par l'inductance voir eq\ref{sec:c}. Pour appliquer la loi des n\oe ud, on considère la situation où le courant proviendrait de $C_1$ le signe ($-$) pour $j=1$  et d'autre part le cas où il proviendrait de $C_2$ signe ($+$) pour $j=2$. C'est exactement pour cela que nous obtenons deux équations du mouvement.
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=3cm]{images/branche_2.png}
+        \caption{sens du flux de branche pour le premier condensateur}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.45\textwidth}
+        \centering
+        \includegraphics[width=3cm]{images/branche_1.png}
+        \caption{sens du flux de branche pour le deuxième condensateur}
+    \end{subfigure}
+    \caption{Ces figures montrent comment on s'oriente pour trouver le flux dans les branches 1 et 2.}
+    \label{sec:p}
+\end{figure}
+
+
+
+\noindent
+Ici nous donnons une explication plus claire de l'équation différentielle trouvée dans la section~\ref{sec:s}. À travers la figure A on écrit la loi des n\oe ud. Comme nous avons imposés un flux extérieur induit par un courant extérieur $I$, c'est donc un courant entrant qui arrive au n\oe ud et ensuite se divise sur tout le circuit. Les courant qui en ressortent sont ceux des deux jonctions Josephson et celui du condensateur de charge $C$ sur la partie supérieur de la figure voir eq~\ref{sec:j}. En remarquant que le courant entrant au borne du condensateur de charge $C_g$ est le même que celui qu'on fournit au circuit, il est dans ce cas facile d'écrire l'eq~\ref{sec:x}. Nous avons le même flux de n\oe ud pour les deux jonctions et le condensateur de charge $C$ voir eq~\ref{sec:y}. On emprunte à présent le chemin de la figure B ie la branche principale du circuit. Le flux extérieur est la somme des autres flux dans la branche voir eq~\ref{sec:z}.
+
+
+\subsection{Équation du mouvement}
+ %% Y JOINDRE LE CIRCUIT DE REFERENCE %%
+ On établie l'équation différentielle voir Sec.\ref{sec:met} traduisant l'évolution  du circuit en considérant chaque composant du circuit comme un cas isolé avant de les mettre ensemble. Nous écrirons ensuite toutes les définitions classiques des différents paramètres en fonction du flux, considérés comme la quantité de paires de Cooper qui traversent la barrière.  On prend l'exemple de circuit  supraconducteur voir fig.\ref{sec:ras} composé de deux condensateurs de capacité ($C_1\; ; \;  C_2$), de deux jonction Josephson d'énergie ($U_{EJ1}\; ; \; U_{EJ2}$) lié avec une inductance $L$ voir Ref~\cite{rasmussen2021} (pour plus de détails).
+ Notons d'abord la définition des différents paramètres en fonction du flux des paires de Cooper:
+ \begin{equation}
+ U_C=\frac{q(t)}{C}=\frac{d\phi}{dt}\quad  I_C(t)=C\frac{dU_C}{dt}=C\ddot{\phi}_j(t)\quad E=\frac{1}{2}C\dot{\phi}^2_j(t)\; ; j=1\; ; 2.
+ \label{sec:my}
+ \end{equation}
+Où $q$ est la charge accumulée dans le temps aux bornes du condensateur, $I$ est l'intensité du courant qui traverse le condensateur  et $E$ est l'énergie fournie par celui-ci, l'indice $j$ représente les deux condensateur.
+
+
+Pour l'inductance $L$ les mêmes paramètres sont présent avec des définition différentes:
+\begin{equation}
+U_L=L\frac{di}{dt}=L\ddot{q}(t) \quad  I_L(t)=\dot{q}(t) 
+\end{equation}
+La contribution énergétique des deux jonction Josephson est donnée par:
+\begin{equation}
+U_J=-E_J\cos{\varphi}_j \quad I_{Jj}=I_{cj}\sin{\varphi}_j \quad I_{cj} \quad \mbox{sont les courant critiques.}
+\end{equation}
+On constate que l'énergie cinétique est fournie au système par le condensateur, les jonctions et l'inductance fournissent l'énergie potentiel.
+
+Les variables dynamiques sont les flux généralisés
+\begin{equation}
+\phi_1(t), \qquad \phi_2(t),
+\end{equation}
+définis comme les intégrales temporelles des tensions :
+\begin{equation}
+\dot{\phi}_j(t) = V_j(t), \quad j = 1,2.
+\end{equation}
+
+Nous admettons ces relations, donc nous ne les démontrerons pas ici voir , la phase Josephson $\varphi$ est reliée au flux par:
+\begin{equation}
+\varphi = \frac{2\pi}{\Phi_0}\phi,
+\qquad
+\Phi_0 = \frac{h}{2e},
+\end{equation}
+où $\Phi_0$ est le quantum de flux. L’énergie électrostatique d’un condensateur est
+\begin{equation}
+E_C = \frac{1}{2} C V^2.
+\end{equation}
+Comme $V = \dot{\phi}$, l’énergie cinétique du circuit est
+\begin{equation}
+T = \frac{1}{2}C\dot{\phi}_1^2 + \frac{1}{2}C\dot{\phi}_2^2.
+\end{equation}
+La tension étant la dérivée du flux par rapport au temps on déduit le flux dans chaque branche:
+\begin{align}
+-\Phi_{EJ1} - \Phi_{C1} &= 0 \label{sec:a} \\
+\Phi_{EJ2} + \Phi_{C2} &= 0  \label{sec:b}\\
+\Phi_{EJ1} - \Phi_{EJ2} + \Phi_L &= \Phi  \label{sec:c}
+\end{align}
+
+La loi des n\oe uds nous donne:
+\begin{equation}
+- I_{C j} + I_{EJ j} = \mp I_L \quad 
+\end{equation}
+Pour l'ensemble des trois mailles du circuit on a :
+\begin{equation}
+\Phi_L = \Phi_2 - \Phi_1 + \tilde{\Phi}
+\end{equation}
+L'équation différentielle est dans ce cas donnée par:
+\begin{equation}
+C_n \ddot{\Phi}_n=
+\mp \frac{1}{L_{12}}
+\left( \Phi_2 - \Phi_1 + \tilde{\Phi} \right)
+- E_{J,j}\,\sin \Phi_j
+\end{equation}
+
+%%=====================================================
+%section schéma
+%============================================
+
+\section{SQUID}
+\label{sec:s}
+\subsection{Présentation du circuit}
+Le Squid est un circuit supraconducteur ne comportant que seulement deux jonctions. Il existe différente manière de le construire, ici nous supposons  qu'il y a un courant qui traverse le condensateur de grille $C_g$ couplé au Squid. Cela crée un flux interne à l'intérieur de la boucle de surface $S$ de courant contenant les deux jonctions Josephson et $C_g$. L'existence du flux interne $\Phi$ dans la boucle montre qu'il y a bien un champ magnétique $B=\Phi/S$. L'utilité du Squid est de mesurer ce champ magnétique, nous allons étudier un exemple de Squid et comprendre son spectre.
+
+
+\subsection{Équation du mouvement}
+ Comme  décrit un peu plus haut, nous allons étudier le circuit supraconducteur ci-dessous%ici on insère la reference du dessin%. 
+On se sert de la loi des n\oe ud, de la définition d'un flux de branche, du boucle de courant puis enfin on appliquera la loi des mailles dans chaque sous circuit pris comme un cas isolé (voir plus loin \ref{sec:met} ). Le circuit est soumis à un courant extérieur $I$ qui induit à son tour un flux extérieur $\tilde{\Phi}$. 
+
+En se servant du n\oe ud $1$ ou $2$ le courant $I$ devient:
+\begin{equation}
+I=I_C+I_{J1}+I_{J2};
+\label{sec:j}
+\end{equation}
+En utilisant (\ref{sec:my}), on retrouve l'équation différentielle du circuit supraconducteur:
+
+\begin{equation}
+C_g \, \ddot{\Phi}_{cg}
+= C \, \ddot{\Phi}
++ I_{c1} \sin \varphi_{j1}
++ I_{c2} \sin \varphi_{j2}
+\label{sec:x}
+\end{equation}
+
+\begin{equation}
+C_g \, \ddot{\Phi}_{cg}
+= C \, \ddot{\Phi}
++ I_{c1} \sin\!\left(\frac{2\pi \Phi}{\Phi_0}\right)
++ I_{c2} \sin\!\left(\frac{2\pi \Phi}{\Phi_0}\right)
+\end{equation}
+
+\begin{equation}
+\Phi_{c1} = \Phi_{j1} = \Phi_{j2} = \Phi
+\label{sec:y}
+\end{equation}
+
+\begin{equation}
+-\tilde{\Phi} - \Phi_{cg} - \Phi_{j2} = 0
+\label{sec:z}
+\end{equation}
+
+\begin{equation}
+\Phi_{cg} = -\tilde{\Phi} - \Phi
+\end{equation}
+
+\begin{equation}
+- C_g \left( \ddot{\Phi} + \ddot{\tilde{\Phi}} \right)
+= I_{c1} \sin\!\left(\frac{2\pi \Phi}{\Phi_0}\right)
++ I_{c2} \sin\!\left(\frac{2\pi \Phi}{\Phi_0}\right)
++ C \, \ddot{\Phi}
+\end{equation}
+
+\begin{equation}
+C_g \left( \ddot{\Phi} + \ddot{\tilde{\Phi}} \right)
++ I_{c1} \sin\!\left(\frac{2\pi \Phi}{\Phi_0}\right)
++ I_{c2} \sin\!\left(\frac{2\pi \Phi}{\Phi_0}\right)
++ C \, \ddot{\Phi}
+= 0
+\end{equation}
+
+
+\begin{equation}
+P = \frac{dE}{dt}
+\quad\Rightarrow\quad
+E = -I_C\frac{\Phi_0}{2\pi} \cos\!\left(\frac{2\pi \Phi}{\Phi_0}\right).
+\end{equation}
+
+\begin{equation}
+E_{J1}=\frac{\Phi_0}{2\pi}I_{C1} ; \quad  E_{J2}=\frac{\Phi_0}{2\pi}I_{J2}
+\end{equation}
+
+ Le Lagrangien est $\mathcal{L}= T-V$, ici $V \equiv E$ alors on aura alors 
+en effectuant le changement de variable    $\Phi\rightarrow \Phi+\tilde{\Phi}$, le Lagrangien vaut:
+
+%%======================================================
+% Le lagrangien
+%%=====================================================
+
+
+\begin{equation}
+\mathcal{L}
+= \frac{1}{2} C_g\,\dot{\Phi}^{\,2}
++ \frac{1}{2} C(\dot{\Phi}-\dot{\tilde{\Phi}})^{\,2}
++ E_{J1} \cos\!\left( 2\pi\,\frac{\tilde{\Phi} - \Phi}{\Phi_0} \right)
++ E_{J2}\cos\!\left( 2\pi\,\frac{\tilde{\Phi} - {\Phi}}{\Phi_0} \right).
+\label{sec:lag}
+\end{equation}
+%%================================
+%Hamiltonien
+%================================
+Il est important avant d'écrire le Hamiltonien de souligner que $\tilde{\Phi}$ n'est pas une variable dynamique par conséquent il ne contribue pas dans le Hamiltonien et ne possède donc pas de moment conjugué. Nous avons:
+
+\begin{equation}
+\mathcal{H}=Q\dot{\Phi}-\mathcal{L}.
+\end{equation}
+\begin{align}
+Q  &= \frac{\partial \mathcal{L}}{\partial \dot{\Phi}} = C_g \dot{\Phi}+C\left(\dot{\Phi}-\dot{\tilde{\Phi}}\right) \\
+    &=\dot{\Phi}\left(C_g+C\right)-C\dot{\tilde{\Phi}}
+\label{sec:f}
+\end{align}
+On retient donc:
+\begin{equation}
+\dot{\Phi}=\frac{Q+C\dot{\tilde{\Phi}}}{C+C_g}
+\end{equation}
+
+En remplaçant le moment conjugué par son expression on trouve:
+\begin{equation}
+\mathcal{H}
+= \frac{Q^{2}}{2(C + C_{g})}
+- \frac{C\,Q\,\dot{\tilde{\Phi}} + C C_{g}\,\dot{\tilde{\Phi}}}{C + C_{g}}
+- E_{J1}\cos\!\left( 2\pi\,\frac{\tilde{\Phi} - \Phi}{\Phi_{0}} \right)
+- E_{J2}\cos\!\left( 2\pi\,\frac{\tilde{\Phi} - \Phi}{\Phi_{0}} \right).
+\end{equation}
+On impose le flux extérieur $\tilde{\Phi}$ constant donc sa dérivée est nulle. En posant une charge équivalente du condensateur $C+C_g=C_e$ et une énergie effective $E_{\mathrm{eff}}=E_{J1}-E_{J2}$ puis en factorisant par le $\cos{(argument)}$, on réduit le Hamiltonien  à seulement:
+\begin{equation}
+\mathcal{H}= \frac{Q^{2}}{2C_e}-E_{\mathrm{eff}}\cos\!\left( 2\pi\,\frac{\tilde{\Phi} - \Phi}{\Phi_{0}} \right).
+\label{sec:qt}
+\end{equation}
+L'instabilité de ce terme résulte dans la partie cosinus, de plus il oscille plus vite vers son maximum si le flux extérieur imposé se rapproche du flux de jonction. 
+
+%%%================================================
+% la partie quantification
+%==================================================
+\subsection{Quantification}
+Faisons un petit digression pour comprendre l'origine de la quantification du flux.
+
+\subsubsection{Cadre et hypoth\`eses}
+
+La quantification du flux magn\'etique est une cons\'equence directe de la \textbf{coh\'erence quantique macroscopique} du condensat supraconducteur. Fritz London avait pr\'edit d\`es 1950 que le flux magn\'etique \`a travers un anneau supraconducteur devait \^etre quantifi\'e. Cette pr\'ediction a \'et\'e confirm\'ee exp\'erimentalement en 1961 par Deaver \& Fairbank et par Doll \& N\"abauer.
+
+L'argument repose sur le fait que le param\`etre d'ordre $\psi = |\psi|\,e^{i\theta}$ est une fonction d'onde macroscopique qui doit \^etre monovaluee. Consid\'erons un anneau supraconducteur. Profond\'ement \`a l'int\'erieur du mat\'eriau (loin des surfaces), le courant supraconducteur est nul et le champ magn\'etique est expuls\'e. La condition de monovaluee impose que la phase $\theta$ ne peut varier, lors d'un tour complet autour de l'anneau, que d'un multiple entier de $2\pi$ :
+\begin{equation}
+    \oint \nabla\theta \cdot d\vec{l} = 2\pi n, \qquad n \in \mathbb{Z}
+\end{equation}
+
+\subsubsection{\'Equation de quantification}
+
+En combinant cette condition avec l'expression du courant supraconducteur et le th\'eor\`eme de Stokes, on obtient la quantification du flux magn\'etique:
+
+\begin{equation}
+    \Phi = n\,\Phi_0, \qquad n \in \mathbb{Z}
+\end{equation}
+avec le quantum de flux :
+\begin{equation}
+    \Phi_0 = \frac{h}{2e} \approx 2{,}07 \times 10^{-15}\;\text{Wb} = 2{,}07 \times 10^{-7}\;\text{G}\cdot\text{cm}^2
+\end{equation}
+
+Le facteur $2e$ (et non $e$) au d\'enominateur est d'une importance capitale : il montre que les porteurs de charge dans l'\'etat supraconducteur ne sont pas des \'electrons individuels mais des \textbf{paires} d'\'electrons de charge $2e$. Cette observation constitua une confirmation exp\'erimentale directe de l'hypoth\`ese de l'appariement, trois ans apr\`es la publication de la th\'eorie BCS.
+
+
+Pour quantifier l'eq~\ref{sec:qt}, on considère d'abord le crochet de poisson entre le nombre total de charge et la phase supraconductrice:
+\begin{equation}
+\{\Phi, Q\}=\pm1
+\end{equation}
+Où $Q$ est la charge totale accumulée dans le circuit supraconductrice et $\Phi$ est le flux dû aux deux jonctions Josephson présentent dans le circuit. Par correspondance entre terme classique et quantique on a:
+\begin{equation}
+\mathcal{H}\rightarrow \hat{\mathcal{H}}\quad \Phi \rightarrow \hat{\Phi} \quad Q\rightarrow \hat{Q}
+\end{equation}
+% 1. Relation entre Q et n
+On définit $n$ comme étant le nombre total de paires de Cooper qui ont étés ajoutées ou retirées ($+$; $-$)  de l'îlot.
+\begin{equation}
+n = -\frac{Q}{2e} \ \rightarrow \hat{n} = \frac{\hat{Q}}{2e}, \qquad \hat{Q} = -2e\,\hat{n}
+\end{equation}
+L'opérateur Hamiltonien ainsi définit aura la forme suivante:
+\begin{align}
+\mathcal{\hat{H}}
+&= \frac{\hat{Q}^2}{2C_e}
++ E_{\mathrm{eff}} \cos\!\left( \frac{2\pi}{\Phi_0}(\tilde{\Phi} - \hat{\Phi}) \right)\\
+&= 4E_C\,\hat{n}^2
++ E_{\mathrm{eff}} \cos\!\left( \frac{2\pi}{\Phi_0}(\tilde{\Phi}- \hat{\Phi}) \right)\; ;E_C=\frac{e^2}{2C_e} \quad \mbox{Ref\cite{nakamura}}
+\end{align}
+% 2. Commutation entre Phi et n
+
+\begin{equation}
+[\hat{\Phi},\hat{Q}] = i\hbar
+\end{equation}
+\begin{equation}
+[\hat{\Phi},\hat{Q}] = [\hat{\Phi}, -2e\,\hat{n}]
+= 2e[\hat{\Phi},\hat{n}] = -i\hbar
+\end{equation}
+
+\begin{equation}
+[\hat{n},\hat{\Phi}] = \frac{i\hbar}{2e}
+= i\,\frac{\Phi_0}{2\pi}
+\end{equation}
+\begin{equation}
+\hat{\varphi} = \frac{2\pi}{\Phi_0}\hat{\Phi},
+\qquad
+[\hat{n},\hat{\varphi}] = i \qquad 
+\tilde{\varphi}=\frac{2\pi}{\Phi_0}\tilde{\Phi}
+\end{equation}
+
+
+%=====================================
+% fin de la partie quantification
+%%=======================================
+
+\subsection{Recherche du spectre}
+
+Maintenant on se place dans la base des charges $\{n\in\mathbb{Z}\}$, nous avons les relations suivantes:
+\begin{equation}
+\hat{n}|n\rangle = n|n\rangle, \qquad n\in\mathbb{Z}, \qquad 
+\sum_n |n\rangle\langle n| = \mathbb{I}.
+\label{sec:n}
+\end{equation}
+\begin{equation}
+4E_C\hat{n}^2 = \sum_n 4E_C n^2 |n\rangle\langle n|.
+\end{equation}
+
+\begin{equation}
+\cos(\tilde{\varphi}-\hat{\varphi})
+= \frac12 \left(
+e^{i(\tilde{\varphi}-\hat{\varphi})}
++ e^{-i(\tilde{\varphi}-\hat{\varphi})}
+\right).
+\end{equation}
+Lorsqu'on fait agir l'état $n$ sur la fonction exponentielle, cette action aura pour effet de faire monter ou de descendre l'état selon la relation:
+\begin{equation}
+e^{\pm i\hat{\varphi}} |n\rangle = |n\mp1\rangle.
+\label{eq:m}
+\end{equation}
+Donc on trouve la relation:
+\begin{equation}
+\cos(\tilde{\varphi}-\hat{\varphi})|n\rangle
+= \frac12\Big(
+e^{i\tilde{\varphi}}|n-1\rangle
++ e^{-i\tilde{\varphi}}|n+1\rangle
+\Big).
+\end{equation}
+
+L'action de l'opérateur Hamiltonien  dans cette base est:
+\begin{equation}
+\langle n|\mathcal{\hat{H}}|m\rangle
+=4E_C n^2\delta_{nm}
++\frac{E_{\mathrm{eff}}}{2}
+\left(
+e^{i\tilde{\varphi}}\delta_{n,m-1}
++e^{-i\tilde{\varphi}}\delta_{n,m+1}
+\right).
+\end{equation}
+En utilisant l'eq~\ref{sec:n}, le Hamiltonien seul s'écrit 
+\begin{align}
+\mathcal{\hat{H}} &=\sum_{n,m}|n\rangle\langle n|\mathcal{\hat{H}}|m\rangle\langle m|\\
+&= \sum_n 4E_C n^2 |n\rangle\langle n|
++\frac{E_{\mathrm{eff}}}{2}
+\sum_n \Big(
+e^{i\tilde{\varphi}} |n\rangle\langle n+1|
++ e^{-i\tilde{\varphi}} |n+1\rangle\langle n|
+\Big).
+\end{align}
+On trouve ainsi la matrice~\ref{sec:h}, la diagonale principale est occupée par l'énergie effective des condensateurs, la diagonale supérieur (resp. inférieure) est celle de la phase extérieure et son conjuguée. Pour déterminer une telle matrice nous devons nous placer dans certaines  situations afin de trouver les spectres du Hamiltonien voir section~\ref{sec:d}
+\begin{equation}
+\mathcal{H} =
+\begin{pmatrix}
+4E_C N^2 & \frac{E_{\mathrm{eff}}}{2}e^{-i\tilde{\varphi}} & 0 & \cdots & 0 \\
+\frac{E_{\mathrm{eff}}}{2}e^{i\tilde{\varphi}} & 4E_C (N-1)^2 & \frac{E_{\mathrm{eff}}}{2}e^{-i\tilde{\varphi}} & \cdots & 0 \\
+0 & \frac{E_{\mathrm{eff}}}{2}e^{i\tilde{\varphi}} & 4E_C (N-2)^2 & \cdots & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+0 & 0 & 0 & \cdots & 4E_C N^2
+\end{pmatrix}.
+\label{sec:h}
+\end{equation}
+
+\subsection{Interprétation}
+Nous faisons une troncature dans l'ensemble des nombreuses valeurs que $n$ peut prendre, pour cela on se place dans la base $\mathcal{B}_2 = \{ |0\rangle, |1\rangle \}$. On reconstitue le Hamiltonien dans cet espace à  deux niveaux afin de déterminer les valeurs propres (spectres).
+Pour le terme capacitif on a :
+\begin{equation}
+\langle 0|4E_C\hat{n}^2|0\rangle = 0, 
+\qquad
+\langle 1|4E_C\hat{n}^2|1\rangle = 4E_C.
+\end{equation}
+Pour le terme Josephson on a :
+\begin{equation}
+\langle 0|\mathcal{\hat{H}}|1\rangle = \frac{E_{\mathrm{eff}}}{2}e^{-i\tilde{\varphi}},
+\qquad
+\langle 1|\mathcal{\hat{H}}|0\rangle = \frac{E_{\mathrm{eff}}}{2}e^{i\tilde{\varphi}}.
+\end{equation}
+Ainsi le Hamiltonien dans cette base s'écrit alors :
+\begin{equation}
+\mathcal{H} =
+\begin{pmatrix}
+0 & \dfrac{E_{\mathrm{eff}}}{2} e^{-i\tilde{\varphi}} \\
+\dfrac{E_{\mathrm{eff}}}{2} e^{i\tilde{\varphi}} & 4E_C
+\end{pmatrix}.
+\end{equation}
+De la relation  $\det(H - E I) = 0$, on diagonalise 
+
+\begin{equation}
+\begin{vmatrix}
+-E & \dfrac{E_{\mathrm{eff}}}{2} e^{-i\tilde{\varphi}} \\
+\dfrac{E_{\mathrm{eff}}}{2} e^{i\tilde{\varphi}} & 4E_C - E
+\end{vmatrix}
+= 0.
+\end{equation}
+La résolution de cette équation nous conduits à deux valeurs propres:
+\begin{equation}
+E_{\pm}
+= 2E_C \pm \sqrt{4E_C^2 + \frac{E_{\mathrm{eff}}^2}{4}}.
+\end{equation}
+Pour aller plus loin on peut bien évidemment déterminer leurs vecteurs propres associés en résolvant:
+\begin{equation}
+(H - E_\pm I)
+\begin{pmatrix}
+a \\ b
+\end{pmatrix}
+= 0.
+\end{equation}
+Où $a$ et $b$ sont les composantes du  vecteur propre $\psi_{\pm}$ associés à la valeur propre $E_+$ et $E_-$ respectivement.
+\begin{equation}
+- E_\pm a + \frac{E_{\mathrm{eff}}}{2} e^{-i\tilde{\varphi}} b = 0
+\quad \Rightarrow \quad
+b = \frac{2E_\pm}{E_{\mathrm{eff}}} e^{i\tilde{\varphi}} a.
+\end{equation}
+\begin{equation}
+|\psi_\pm\rangle
+= \mathcal{N}_\pm
+\left(
+|0\rangle
++ \frac{2E_\pm}{E_{\mathrm{eff}}} e^{i\tilde{\varphi}} |1\rangle
+\right),
+\end{equation}
+Où $\mathcal{N}$ est un facteur de normalisation. Nous venons de constituer un système à deux niveaux appelé quantum-bit (Qubit), les deux valeurs propres $E_\pm$ définissent les deux niveaux d’énergie
+du qubit, et les états propres sont des superpositions des états de charge
+$|0\rangle$ et $|1\rangle$. %On voit clairement que le flux extérieur ne contribue pas dans le cas d'un système à deux niveaux.
+
+%=======================================
+% on explique la méthode de détermination de l'edf
+%=======================================
+
+\section{Transmon}
+\subsection{Présentation du circuit}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/co_box_circuit.png}
+    \caption{Boîte à pair de Cooper avec une tension externe imposée $V_g$ qui alimente un condensateur de charge $C_g$. La tension externe crée une accumulation de charge $n_g$ aux bornes du condensateur de grille. Le nombre de charge $n_g$ est définit est un paramètre clé du problème car il montre dans quelle condition le circuit peut être considéré comme stable.}
+    \label{fig:pairbox}
+\end{figure}
+\vspace{-4mm}
+Un transmon est un circuit supraconducteur qui comporte au moins une jonction Josephson c'est l'équivalent de l'oscillateur harmonique classique voir Fig~\ref{fig:pairbox}. Il est constitué de seulement une jonction couplé à un condensateur de grille, il est considéré comme moins sensible aux bruits de charge aux passages de la tension appliquées ici notée $V_g$.
+
+\subsection{Équation du mouvement}
+Nous appliquons toujours les mêmes règles pour déterminer le Hamiltonien du circuit. Il y a une multitude de façons de l'écrire mais nous choisissons celle qui réduit le nombre de degré de liberté au stricte nécessaire. On soumet le circuit à une tension extérieur notée $V_g$, ainsi nous avons:
+
+\begin{equation}
+V_g + V_B + V_C=  V_g+\dot{\phi}_B+\dot{\phi}_C=0
+\label{sec:A}
+\end{equation} 
+
+\begin{equation}
+C_\Sigma = C + C_g
+\end{equation}
+Dans la branche contenant la tension $V_g$ on a $\dot{\phi}_g=\dot{\phi}_C$. D'après l'éq~\ref{sec:A} $\dot{\phi}_C=-(V_g+\dot{\phi}_B)$.
+
+\begin{align}
+\mathcal{L}&=\frac{1}{2}C_g\dot{\phi}_C^2+\frac{1}{2}C\dot{\phi}_B^2-E_J\cos{\varphi}\\
+&=\frac{1}{2}C_g(V_g+\dot{\phi}_B)^2+\frac{1}{2}C\dot{\phi}_B^2-E_J\cos{\varphi}
+\end{align}
+
+En utilisant (\ref{sec:f}), on trouve le Hamiltonien du transmon:
+
+\begin{align}
+H
+&= \frac{Q^2}{2(C+C_g)}
+- \frac{2(C+C_g)Q\,C_g V_g}{2(C+C_g)^2}
+- \frac{C_g (C V_g)^2}{2(C+C_g)^2}
+- \frac{C (C_g V_g)^2}{2(C+C_g)^2}
+- E_J \cos\varphi
+\\[0.5em]
+&= \frac{Q^2}{2C_\Sigma}
+- \frac{2 Q C_g V_g}{2C_\Sigma}
+- \frac{C C_g V_g^2}{2C_\Sigma}
+- E_J \cos\varphi
+\\[0.5em]
+&= \frac{(Q - C_g V_g)^2}{2C_\Sigma}
+- \frac{C_g^2 V_g^2}{2C_\Sigma}
+- \frac{C C_g V_g^2}{2C_\Sigma}
+- E_J \cos\varphi
+\\[0.5em]
+&= \frac{(Q - C_g V_g)^2}{2C_\Sigma}
+- \frac{C_g V_g^2 (C_g + C)}{2C_\Sigma}
+- E_J \cos\varphi
+\\[0.5em]
+&= \frac{(Q - C_g V_g)^2}{2C_\Sigma}
+- \frac{C_g V_g^2}{2}
+- E_J \cos\varphi
+\end{align}
+
+
+
+\begin{equation}
+n_g = \frac{C_g V_g}{2e},
+\qquad
+E_C = \frac{e^2}{2C_\Sigma}
+\end{equation}
+
+\begin{equation}
+H
+= 4E_C (\hat n - n_g)^2
+- \frac{C_g V_g^2}{2}
+- E_J \cos{\hat{\varphi}}
+\end{equation}
+Le terme du milieu ne dépend ni de $\varphi$ de $n$, c'est donc  une constante d'énergie on peut donc le négligeable tel que le Hamiltonien s'écrit:
+\begin{equation}
+H
+= 4E_C (\hat n - n_g)^2
+- E_J \cos{\hat{\varphi}}
+\end{equation}
+
+En insérant la relation de fermeture une fois de plus, le Hamiltonien s’écrit
+\begin{equation}
+\hat H
+= \sum_{n,m} |n\rangle \langle n| \hat H |m\rangle \langle m| .
+\end{equation}
+Dans la base des charges le hamiltonien est en réalité une somme de terme provenant du condensateur de charge et de la jonction Josephson pas à pas on trouve:
+\subsubsection{Terme de charge}
+
+On développe le carré :
+\begin{equation}
+(\hat n - n_g)^2 = \hat n^2 - 2n_g \hat n + n_g^2 .
+\end{equation}
+
+Le terme de charge devient
+\begin{equation}
+\hat H_C = 4E_C(\hat n^2 - 2n_g \hat n + n_g^2).
+\label{eq:v}
+\end{equation}
+
+Les éléments de matrice sont
+\begin{equation}
+\langle n | \hat n^2 | m \rangle = n^2 \delta_{nm},
+\end{equation}
+\begin{equation}
+\langle n | \hat n | m \rangle = n \delta_{nm}.
+\end{equation}
+
+Ainsi,
+\begin{equation}
+\hat H_C
+= 4E_C \sum_{n,m}
+(n^2 - 2n_g n + n_g^2)
+|n\rangle \langle n | m \rangle \langle m| .
+\end{equation}
+
+En utilisant $\langle n | m \rangle = \delta_{nm}$, la somme sur $m$ se réduit et on obtient
+\begin{equation}
+\hat H_C
+= 4E_C \sum_n (n^2 - 2n_g n + n_g^2) |n\rangle\langle n| .
+\end{equation}
+
+Le terme $4E_C n_g^2$ étant une constante d’énergie globale, on peut l’omettre, ce qui donne
+\begin{equation}
+\hat H_C
+= 4E_C \sum_n (n - n_g)^2 |n\rangle\langle n| .
+\end{equation}
+
+\subsubsection{Terme Josephson}
+
+L’opérateur de phase agit sur les états de charge selon l'eq~\ref{eq:m} voir sec~\ref{sec:z} pour plus de détails.
+
+On écrit
+\begin{equation}
+\cos\hat\varphi = \frac{1}{2}
+\left( e^{i\hat\varphi} + e^{-i\hat\varphi} \right).
+\end{equation}
+
+Les éléments de matrice peuvent êtres réécrit comme suite:
+\begin{equation}
+\langle n | \cos\hat\varphi | m \rangle
+= \frac{1}{2}\left(\delta_{n,m+1} + \delta_{n,m-1}\right).
+\end{equation}
+
+Le terme Josephson s’écrit donc
+\begin{equation}
+\hat H_J
+= -\frac{E_J}{2}
+\sum_n
+\left(
+|n\rangle\langle n+1|
++ |n+1\rangle\langle n|
+\right).
+\label{eq:w}
+\end{equation}
+
+
+
+Le Hamiltonien total dans la base de charge est finalement
+\begin{equation}
+\mathcal{\hat H} =
+4E_C \sum_n (n - n_g)^2 |n\rangle\langle n|
+-\frac{E_J}{2}
+\sum_n
+\left(
+|n\rangle\langle n+1|
++ |n+1\rangle\langle n|
+\right).
+\label{eq:r}
+\end{equation}
+
+
+\subsection{Spectre}
+\label{sec:d}
+
+%=====================================
+%interprétation du hamiltonien
+%%==========================================
+\subsection{Interprétation}
+\label{sec:z}
+La forme du Hamiltonien de l'eq~(\ref{eq:r}) résulte du fait qu'il y a un couplage entre la jonction Josephson et les condensateurs de charges $C$ et celui du condensateur de grille de charge $C_g$ sur lequel on applique une tension de grille $V_g$. Cela avait été introduit dès le départ voir eq~(\ref{eq:Hb}) comme la forme du Hamiltonien provenant de la jonction Josephson seulement en absence de couplage. En alimentant le circuit par une tension de grille on alimente le condensateur de grille. On définit $n_g$ le nombre total de charges accumulées aux bornes de ce condensateur. Contrairement à la fonction de régulateur du condensateur de grille, le condensateur de charge accumule le défauts ou le gain d'électrons avant de le restitué à la jonction Josephson. Les équations~(\ref{eq:v}) et (\ref{eq:w}) nous montre comment chaque composant du circuit contribue à l'évolution du système. Le Hamiltonien total du système est par conséquent une somme de termes de charge et de la jonction. 
+La diagonale est occupée par les états ayant les mêmes niveaux d'énergies et les autres éléments caractérisent le couplage entre les jonction et le condensateur de charges.
+
+À ce point nous avons tout ce qu'il nous faut pour décrire l'évolution du système. 
+Le spectre est la largement déterminé par la valeur du nombre de charge accumulée sur le condensateur de charge $C_g$. Le nombre $n_g$ joue un rôle dans la levée de dégénérescence  puisqu'on doit diagonaliser $\mathcal{\hat{H}}$ pour chaque valeur de ce nombre (voir section~\ref{sec:d} ). 
+%Pour le cas particulier d'une matrice $2\times2$, si aucune ne s'accumule c'est à dire $n_g=0$, le spectre est donné par la relation suivante:
+%\begin{equation}
+%-\lambda\left(4E_C-\lambda\right)-\frac{E_J^{2}}{4}=0
+%\label{eq:res}
+%\end{equation}
+%On obtient deux spectres non dégénérés $\lambda_+=3E_C$ et $\lambda_-=E_C$ correspondant à l'énergie de l'état fondamental et le premier état excité. 
+Dans une autre situation on choisit $n_g=1/2$, on obtient des spectres d'énergie dégénérés. Pour comprendre comment le spectre est modifié selon les variations du nombre de charge $n_g$, choisissons la même matrice avec un nombre de charge variable. On trouve des spectres en fonction du nombre de charges selon l'éq~(\ref{eq:sp}).
+\begin{equation}
+\lambda_{\pm}(n_g)
+=
+2E_C \left[n_g^2 + (1-n_g)^2\right]
+\pm
+(2E_C)\sqrt{
+ \left[n_g^2 - (1-n_g)^2\right]^2
++
+\left(\frac{E_J}{2E_C}\right)^2
+}.
+\label{eq:sp}
+\end{equation}
+Plus la tension de grille $V_g$ est importante plus les électrons sont accélérés vers le condensateur de grille et y s'accumulent. 
+
+%La stabilité du circuit dépend fortement du rapport $E_J/E_C$, dans la mesure où $E_J \ll E_C$ on obtient  la parabole d'énergie pour l'état fondamental fig (a). La dépendance au bruit de charge disparaît dans le cas où ce rapport augmente, le circuit n'est plus sensible à la fluctuation de charge. Cela correspond à la situation où l'énergie Josephson l'emporte sur l'énergie de charge les oscillations des niveaux d'énergie s'aplatit, c'est le régime de phase ou stabilité quantique. Dans la fig(d), le régime de charge de l'état fondamental  disparaît. Le premier état excité devient le nouveau état de référence et continue de descendre. Ce qui correspondait au deuxième état excité devient le premier état excité et ainsi de suite. 
+
+ 
+
+
+
+
+
+%%=========================================================
+% autres exemples
+%%%%%===============================================
+\section{Bi-SQUID}
+
+\subsection{Présentation du circuit}
+
+Le Bi-SQUID est un circuit supraconducteur form\'e d'une \^ile supraconductrice reli\'ee \`a la masse par trois branches en parall\`ele. Chaque branche contient une jonction Josephson, et deux de ces branches comportent \'egalement une inductance en s\'erie. Une capacit\'e de grille $C_g$ permet de contr\^oler la charge de l'\^ile.
+
+\paragraph{Topologie du circuit}
+
+\begin{itemize}
+    \item \textbf{Branche 1 (gauche)} : Jonction Josephson $E_{J1}$ avec capacit\'e $C_1$, en s\'erie avec inductance $L_1$
+    \item \textbf{Branche 2 (centrale)} : Jonction Josephson $E_{J0}$ avec capacit\'e $C_0$ (branche de r\'ef\'erence)
+    \item \textbf{Branche 3 (droite)} : Jonction Josephson $E_{J2}$ avec capacit\'e $C_2$, en s\'erie avec inductance $L_2$
+\end{itemize}
+
+Deux flux magn\'etiques externes $\Phi_1$ et $\Phi_2$ traversent les boucles supraconductrices form\'ees respectivement par (Branche~1, Branche~2) et (Branche~2, Branche~3). La capacit\'e de grille $C_g$ induit une charge $n_g = C_g V_g / (2e)$.
+
+\paragraph{Degr\'es de libert\'e}
+
+Le circuit poss\`ede trois degr\'es de libert\'e quantiques ind\'ependants :
+
+\begin{enumerate}
+    \item \textbf{Charge de l'\^ile} : $\hat{n}$ (nombre de paires de Cooper)
+    \item \textbf{Oscillateur LC 1} : $\hat{m}_1$ (nombre d'excitations du mode LC form\'e par $C_1$ et $L_1$)
+    \item \textbf{Oscillateur LC 2} : $\hat{m}_2$ (nombre d'excitations du mode LC form\'e par $C_2$ et $L_2$)
+\end{enumerate}
+
+L'espace de Hilbert total est le produit tensoriel $\mathcal{H} = \mathcal{H}_{\text{charge}} \otimes \mathcal{H}_{\text{osc1}} \otimes \mathcal{H}_{\text{osc2}}$ de dimension $(2n_{\max}+1) \times (m_{1,\max}+1) \times (m_{2,\max}+1)$.
+
+
+\subsection{Équation du mouvement}
+
+\subsubsection{Hamiltonien quantique complet}
+
+L'Hamiltonien du syst\`eme se d\'ecompose en quatre contributions :
+\begin{equation}
+    \hat{H} = \hat{H}_{\text{charge}} + \hat{H}_{\text{osc1}} + \hat{H}_{\text{osc2}} + \hat{H}_{\text{Josephson}}
+\end{equation}
+
+\paragraph{\'Energie de charge}
+\begin{equation}
+    \hat{H}_{\text{charge}} = 4E_C \sum_n n^2 |n\rangle\langle n|
+\end{equation}
+avec $E_C = e^2/(2C_\Sigma)$ et $C_\Sigma = C_g + C_0 + C_1 + C_2$.
+
+\paragraph{\'Energies des oscillateurs harmoniques}
+\begin{equation}
+    \hat{H}_{\text{osc,i}} = \hbar\omega_i \left(\hat{a}_i^\dagger \hat{a}_i + \frac{1}{2}\right), \qquad i = 1,2
+\end{equation}
+Les fr\'equences propres sont donn\'ees par :
+\begin{equation}
+    \hbar\omega_i = \sqrt{E_{Li} \cdot E_{Ci}} = \sqrt{\frac{\Phi_0^2}{4\pi^2 L_i} \cdot \frac{e^2}{2C_i}}
+\end{equation}
+
+\paragraph{Couplage Josephson}
+En tenant compte de la quantification du flux ($\Phi = n\Phi_0$ avec $\Phi_0 = h/(2e)$), les phases aux bornes des jonctions sont :
+\begin{align}
+    \varphi_{EJ1} &= \hat{\varphi} + 2\pi f_1 - \hat{\varphi}_{L1} \\
+    \varphi_{EJ0} &= \hat{\varphi} \\
+    \varphi_{EJ2} &= \hat{\varphi} + 2\pi f_2 - \hat{\varphi}_{L2}
+\end{align}
+o\`u $f_i = \Phi_i/\Phi_0$ sont les flux r\'eduits, $\hat{\varphi}$ est la phase de l'\^ile, et $\hat{\varphi}_{Li}$ les phases inductives.
+
+Les phases inductives s'expriment en fonction des op\'erateurs bosoniques :
+\begin{equation}
+    \hat{\varphi}_{Li} = \varphi_{\text{ZPF},i} (\hat{a}_i + \hat{a}_i^\dagger)
+\end{equation}
+avec la fluctuation quantique de phase :
+\begin{equation}
+    \varphi_{\text{ZPF},i} = \left(\frac{E_{Ci}}{E_{Li}}\right)^{1/4}
+\end{equation}
+
+L'\'energie Josephson totale est :
+\begin{equation}
+    \hat{H}_{\text{Josephson}} = -E_{J1} \cos(\varphi_{EJ1}) - E_{J0} \cos(\varphi_{EJ0}) - E_{J2} \cos(\varphi_{EJ2})
+\end{equation}
+
+\subsubsection{Repr\'esentation matricielle}
+
+Dans la base compos\'ee $\{|n, m_1, m_2\rangle\}$, l'Hamiltonien devient une matrice creuse de dimension $d_{\text{tot}} = (2n_{\max}+1)(m_{1,\max}+1)(m_{2,\max}+1)$.
+
+\paragraph{\'El\'ements diagonaux}
+\begin{equation}
+    H_{nn} = 4E_C n^2 + \hbar\omega_1\left(m_1 + \frac{1}{2}\right) + \hbar\omega_2\left(m_2 + \frac{1}{2}\right) + \langle \hat{H}_{\text{J,diag}} \rangle
+\end{equation}
+
+\paragraph{\'El\'ements hors-diagonaux}
+Le terme Josephson couple diff\'erents \'etats via l'op\'erateur de phase $e^{\pm i\hat{\varphi}}$ qui effectue des transitions de charge $n \to n \pm 1$. Les phases inductives $\hat{\varphi}_{Li}$ couplent les \'etats des oscillateurs.
+
+Les \'el\'ements de matrice typiques sont :
+\begin{equation}
+    \langle n \pm 1, m_1', m_2'|\hat{H}|n,m_1,m_2\rangle = -\frac{E_J}{2} \cdot \langle m_1'|e^{\pm i\varphi_{\text{ZPF},1}(\hat{a}_1+\hat{a}_1^\dagger)}|m_1\rangle \cdot \langle m_2'|\ldots|m_2\rangle
+\end{equation}
+
+Ces \'el\'ements cr\'eent un \textbf{enchev\^etrement quantique} entre la charge de l'\^ile et les excitations des oscillateurs LC.
+
+
+\subsection{Spectre}
+
+\subsubsection{M\'ethode de calcul}
+
+Le calcul du spectre d'\'energie n\'ecessite la diagonalisation de matrices de grande dimension. Pour un espace de Hilbert typique avec $n_{\max} = 10$, $m_{1,\max} = 5$, $m_{2,\max} = 5$, la matrice hamiltonienne a $21 \times 6 \times 6 = 756$ dimensions.
+
+\paragraph{Algorithme de diagonalisation}
+
+\begin{enumerate}
+    \item \textbf{Construction} : Cr\'eation de la matrice creuse (format \texttt{lil\_matrix} de SciPy)
+    \item \textbf{Indexation} : Mapping $(n, m_1, m_2) \to$ indice lin\'eaire unique
+    \item \textbf{Remplissage} : Calcul des \'el\'ements de matrice non-nuls uniquement
+    \item \textbf{Conversion} : Format \texttt{csr\_matrix} (optimis\'e pour les op\'erations)
+    \item \textbf{Diagonalisation partielle} : Algorithme de Lanczos (ARPACK) pour les $k$ plus petites valeurs propres
+\end{enumerate}
+
+Cette m\'ethode permet de traiter des espaces jusqu'\`a $\sim 10^4$ dimensions en quelques minutes sur un ordinateur standard.
+
+\subsubsection{Cartographie 2D du spectre}
+
+Pour caract\'eriser compl\`etement le syst\`eme, on calcule les niveaux d'\'energie en fonction des deux flux externes : $E_n(f_1, f_2)$ avec $f_i \in [-0.5, 0.5]$ (p\'eriode $\Phi_0$).
+
+\paragraph{Niveaux d'\'energie fondamentaux}
+
+Le niveau fondamental $E_0(f_1, f_2)$ pr\'esente une structure riche :
+\begin{itemize}
+    \item \textbf{Minima d'\'energie} : Points de fonctionnement optimaux (\textit{sweet spots}) o\`u la sensibilit\'e au bruit de flux est minimale
+    \item \textbf{P\'eriodicit\'e} : $E_0(f_1 + 1, f_2) = E_0(f_1, f_2 + 1) = E_0(f_1, f_2)$
+    \item \textbf{Sym\'etries} : R\'eflexions $f_i \to -f_i$ selon les param\`etres du circuit
+\end{itemize}
+
+\paragraph{Fr\'equences de transition}
+
+La fr\'equence de transition $0 \to 1$ est donn\'ee par :
+\begin{equation}
+    E_{01}(f_1, f_2) = E_1(f_1, f_2) - E_0(f_1, f_2)
+\end{equation}
+
+Cette carte r\'ev\`ele :
+\begin{itemize}
+    \item Les r\'egions o\`u le qubit est accordable en fr\'equence
+    \item Les croisements de niveaux \'evit\'es (signature de couplages)
+    \item Les points de d\'eg\'en\'erescence accidentelle
+\end{itemize}
+
+\paragraph{Niveaux excit\'es}
+
+Les cartes des niveaux $E_2, E_3, E_4, \ldots$ montrent :
+\begin{itemize}
+    \item La structure des bandes d'\'energie
+    \item Les transitions multi-photoniques possibles
+    \item L'anharmonicit\'e spectrale du syst\`eme
+\end{itemize}
+
+
+\subsection{Interprétation}
+
+\subsubsection{R\'egimes physiques}
+
+Le comportement du Bi-SQUID d\'epend du rapport entre les fr\'equences des oscillateurs et les \'energies caract\'eristiques.
+
+\paragraph{R\'egime haute fr\'equence : $\hbar\omega_i \gg E_J, E_C$}
+
+Les oscillateurs restent dans leur \'etat fondamental $|0,0\rangle$. Le syst\`eme se comporte comme un qubit de charge avec des \'energies Josephson renormalis\'ees. Les oscillateurs induisent un d\'eplacement de Lamb perturbatif.
+
+\paragraph{R\'egime interm\'ediaire : $\hbar\omega_i \sim E_J$}
+
+R\'egime le plus riche. Les oscillateurs sont dynamiquement coupl\'es \`a la charge de l'\^ile. On observe :
+\begin{itemize}
+    \item \textbf{Habillage des niveaux} : Les \'etats propres sont des superpositions $|n, m_1, m_2\rangle$
+    \item \textbf{Transitions multi-photoniques} : Changements simultan\'es de $n$, $m_1$ et $m_2$
+    \item \textbf{\'Etats enchev\^etr\'es} : Corr\'elations quantiques charge-oscillateurs
+\end{itemize}
+
+\paragraph{R\'egime basse fr\'equence : $\hbar\omega_i \ll E_J$}
+
+Les oscillateurs sont fortement excit\'es. Approximation semi-classique : les op\'erateurs $\hat{a}_i$ deviennent des nombres complexes $\alpha_i$. Les phases inductives $\varphi_{Li}$ sont trait\'ees comme des variables classiques.
+
+\subsubsection{Comparaison avec le transmon}
+
+Le Bi-SQUID g\'en\'eralise le transmon en ajoutant deux degr\'es de libert\'e (oscillateurs LC) et deux param\`etres de flux. Cette complexit\'e suppl\'ementaire offre :
+
+\paragraph{Avantages}
+\begin{itemize}
+    \item \textbf{Accordabilit\'e} : Deux param\`etres de flux ind\'ependants ($f_1$, $f_2$)
+    \item \textbf{Protection} : Les boucles SQUID r\'eduisent la sensibilit\'e au bruit local
+    \item \textbf{Modes hybrides} : Couplage charge-oscillateur pour des \'etats exotiques
+\end{itemize}
+
+\paragraph{Inconv\'enients}
+\begin{itemize}
+    \item \textbf{Complexit\'e calculatoire} : Espace de Hilbert $\sim 10^3$ dimensions
+    \item \textbf{Calibration} : Cinq param\`etres \`a optimiser ($E_{J0,1,2}$, $\omega_{1,2}$)
+    \item \textbf{Dissipation} : Les inductances peuvent introduire des pertes
+\end{itemize}
+
+
+
+
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+\newpage
+\appendix
+\input{annexes}
+
+
+
+
+
+%%===================================================
+%ici c'est les références qu'on doit citer!
+%%=================================================
+\newpage
+\bibliographystyle{ieeetr}
+\bibliography{biobliographie}
+\end{document}
