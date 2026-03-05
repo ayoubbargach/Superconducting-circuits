@@ -1,6 +1,10 @@
 # Generated figures
 *.pdf
 
+# Results directories
+Results_Triple_Josephson/
+Results_BiSQUID/
+
 # Python cache
 __pycache__/
 *.py[cod]
@@ -17,3 +21,6 @@ ENV/
 .idea/
 *.swp
 *.swo
+
+# Claude Code settings
+.claude/settings.json

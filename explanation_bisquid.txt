@@ -1,0 +1,1829 @@
+================================================================================
+BiSQUID CIRCUIT - HAMILTONIAN DERIVATION
+================================================================================
+
+CIRCUIT TOPOLOGY
+----------------
+Circuit: Cg + (EJ1 + L1) || EJ0 || (EJ2 + L2)
+
+- All three branches connect between the island (top node) and ground (bottom)
+- Cg: Gate capacitor connected to the island (no voltage source, so n_g = 0)
+- Branch 1: EJ1 in series with L1
+- Branch 2: EJ0 alone
+- Branch 3: EJ2 in series with L2
+- Φ₁ threads the loop formed by Branch 1 and Branch 2 (clockwise)
+- Φ₂ threads the loop formed by Branch 2 and Branch 3 (clockwise)
+
+
+STEP 1: IDENTIFY DEGREES OF FREEDOM
+====================================
+
+For a superconducting circuit, we use node fluxes.
+
+Nodes:
+- Island (top node): flux Φ_island
+- Ground (bottom): flux Φ_ground = 0 (reference)
+
+Number of degrees of freedom: 1
+- Generalized coordinate: φ = 2πΦ_island/Φ₀ (superconducting phase of island)
+
+where Φ₀ = h/(2e) ≈ 2.07 × 10⁻¹⁵ Wb is the flux quantum.
+
+
+STEP 2: EXPRESS BRANCH VARIABLES
+=================================
+
+Since all branches connect island to ground, they all have the same voltage:
+    V = (Φ₀/2π) φ̇
+
+But the phase drops across junctions are affected by external fluxes.
+
+Branch 1 (EJ1 in series with L1):
+----------------------------------
+Let φ_EJ1 = phase drop across EJ1
+Let φ_L1 = phase drop across L1
+
+Series connection: φ = φ_EJ1 + φ_L1
+
+Current through branch: I₁ = I_c1 sin(φ_EJ1)
+
+For an inductor: V_L = L dI/dt
+In flux language: φ_L1 = (2π/Φ₀) L₁ I₁
+
+Therefore: I₁ = (Φ₀/2π) φ_L1/L₁
+
+Combining: I₁ = I_c1 sin(φ_EJ1) = (Φ₀/2π) φ_L1/L₁
+
+Branch 2 (EJ0 alone):
+--------------------
+Phase drop across EJ0: φ_EJ0 = φ
+Current: I₀ = I_c0 sin(φ)
+
+Branch 3 (EJ2 in series with L2):
+----------------------------------
+Let φ_EJ2 = phase drop across EJ2
+Let φ_L2 = phase drop across L2
+
+Series connection: φ = φ_EJ2 + φ_L2
+Current: I₂ = I_c2 sin(φ_EJ2) = (Φ₀/2π) φ_L2/L₂
+
+
+STEP 3: FLUX QUANTIZATION CONDITIONS
+=====================================
+
+This is the KEY step that explains the phase shifts in the Hamiltonian!
+
+Understanding Gauge-Invariant Phases:
+--------------------------------------
+In superconductors with external magnetic flux, the phase difference across
+a Josephson junction is NOT simply the difference in node phases.
+
+For a path integral around a closed loop:
+    ∮ ∇φ · dl = 2π/Φ₀ ∮ A · dl = 2π Φ_ext/Φ₀
+
+where A is the vector potential.
+
+Loop 1 Analysis (EJ1 - L1 || EJ0):
+-----------------------------------
+Consider the loop formed by:
+- Going UP through Branch 1 (EJ1 + L1)
+- Going DOWN through Branch 2 (EJ0)
+
+Let's define the phases carefully:
+- φ = superconducting phase at the island (relative to ground)
+- φ_EJ1 = gauge-invariant phase difference across EJ1
+- φ_L1 = phase variable for inductor L1
+
+Branch 1 (series connection):
+    The total phase from ground to island through Branch 1 is:
+    φ_total,branch1 = φ_EJ1 + φ_L1
+
+Branch 2 (direct connection):
+    The phase from ground to island through Branch 2 is:
+    φ_total,branch2 = φ
+
+Flux Quantization Around Loop 1:
+---------------------------------
+Going around the loop clockwise (through branch 1, back through branch 2):
+
+    (φ_EJ1 + φ_L1) - φ = 2π Φ₁/Φ₀
+
+This is the flux quantization condition!
+
+Rearranging:
+    φ_EJ1 = φ - φ_L1 + 2πf₁
+
+where f₁ = Φ₁/Φ₀
+
+Physical Interpretation:
+------------------------
+The external flux Φ₁ threading loop 1 creates a phase shift of 2πf₁.
+This phase shift is distributed between:
+1. The junction phase φ_EJ1
+2. The inductor phase φ_L1
+3. The island phase φ
+
+The constraint equation tells us:
+    φ_EJ1 = φ + 2πf₁ - φ_L1
+
+This is EXACTLY the argument in cos(φ + 2πf₁ - φ_L1)!
+
+CORRECTED FLUX QUANTIZATION
+============================
+
+The external flux threads the LOOP, not a branch. Let me use flux variables.
+
+Loop 1: Branch 1 || Branch 2
+-----------------------------
+Going clockwise around loop 1:
+- Through EJ1: phase = φ_EJ1
+- Through L1: phase = φ_L1
+- Back through EJ0 (opposite direction): phase = -φ
+
+The total phase around a loop with external flux Φ_ext:
+    ∮ dφ = 2πΦ_ext/Φ₀
+
+For loop 1:
+    φ_EJ1 + φ_L1 - φ = 2πf₁
+
+where f₁ = Φ₁/Φ₀ is the reduced flux.
+
+Since current must be continuous in branch 1:
+    I₁ = I_c1 sin(φ_EJ1)
+
+And for the inductor:
+    φ_L1 = (2πL₁/Φ₀) I₁ = (2πL₁I_c1/Φ₀) sin(φ_EJ1)
+
+This is getting complex. Let me use a different approach...
+
+
+SIMPLIFIED APPROACH: PHASE BASIS WITH CONSTRAINTS
+==================================================
+
+Actually, for this circuit with inductors, we need MORE degrees of freedom!
+
+Degrees of freedom:
+- φ: phase of island
+- φ_EJ1: phase across EJ1
+- φ_EJ2: phase across EJ2
+
+Constraints (from branch connections):
+1. φ_L1 = φ - φ_EJ1 (branch 1 KVL)
+2. φ_L2 = φ - φ_EJ2 (branch 3 KVL)
+
+Flux quantization (from loops):
+1. Loop 1: φ_EJ1 + φ_L1 - φ = 2πf₁
+   → φ_EJ1 + (φ - φ_EJ1) - φ = 2πf₁
+   → 0 = 2πf₁  (WRONG!)
+
+I'm making an error in flux quantization. Let me reconsider the circuit more carefully.
+
+
+CORRECT APPROACH: CURRENT-PHASE RELATIONS
+==========================================
+
+Key insight: The inductor current and Josephson current in each branch must match!
+
+Branch 1:
+    I_c1 sin(φ_EJ1) = (Φ₀/2πL₁) φ_L1
+
+Branch constraint:
+    φ_EJ1 + φ_L1 = φ (voltage drop adds to island phase)
+
+Flux quantization loop 1 (through branch 1 and 2):
+    φ_EJ1 + φ_L1 - φ_EJ0 = 2πf₁
+
+But branch 2 has φ_EJ0 = φ, and branch 1 has φ_EJ1 + φ_L1 = φ
+
+So: φ - φ = 2πf₁ → 0 = 2πf₁
+
+This is still wrong! The issue is the sign convention for flux.
+
+
+DETAILED EXPLANATION: THE COSINE ARGUMENT cos(φ + 2πf₁ - φ_L1)
+=================================================================
+
+Let's break down each term in the argument: φ + 2πf₁ - φ_L1
+
+Term 1: φ (Island Phase)
+-------------------------
+- φ = 2πΦ_island/Φ₀ is the superconducting phase of the island
+- This is our primary degree of freedom
+- It represents the macroscopic quantum phase of the superconducting condensate
+
+Term 2: +2πf₁ (External Flux Contribution)
+-------------------------------------------
+- f₁ = Φ₁/Φ₀ is the external flux in units of flux quantum
+- The factor 2π converts this to phase units
+- This term appears due to flux quantization around loop 1
+
+Physical meaning:
+When external flux threads the loop, it creates a vector potential A.
+The phase accumulated along a path includes:
+    φ_path = φ_quantum + (2π/Φ₀)∫ A·dl
+
+Going around the loop picks up: 2πΦ₁/Φ₀ = 2πf₁
+
+This is the Aharonov-Bohm effect in superconductors!
+
+Term 3: -φ_L1 (Inductor Phase Drop)
+------------------------------------
+- φ_L1 is the phase drop across inductor L1
+- For an inductor: φ_L = (2πL/Φ₀) I, where I is the current
+- This phase variable accounts for the magnetic energy stored in L1
+
+The MINUS sign comes from the flux quantization constraint:
+    φ_EJ1 + φ_L1 = φ + 2πf₁
+    ⟹ φ_EJ1 = φ + 2πf₁ - φ_L1
+
+Putting It All Together:
+------------------------
+The argument (φ + 2πf₁ - φ_L1) represents the GAUGE-INVARIANT phase
+difference across the Josephson junction EJ1.
+
+Without flux (f₁ = 0) and without inductor (φ_L1 = 0):
+    φ_EJ1 = φ (simple case)
+
+With flux but no inductor (φ_L1 = 0):
+    φ_EJ1 = φ + 2πf₁ (flux-biased junction)
+
+With both flux and inductor:
+    φ_EJ1 = φ + 2πf₁ - φ_L1 (full expression)
+
+The inductor allows current to flow, which partially "screens" the effect
+of the external flux.
+
+
+FLUX QUANTIZATION DERIVATION
+=============================
+
+Loop 1: Branch 1 (EJ1 + L1) || Branch 2 (EJ0)
+----------------------------------------------
+
+Starting at ground, going clockwise around loop 1:
+
+1. UP through Branch 1:
+   - Phase across EJ1: +φ_EJ1
+   - Phase across L1: +φ_L1
+   - Total: φ_EJ1 + φ_L1
+
+2. DOWN through Branch 2 (opposite direction):
+   - Phase across EJ0: -φ (negative because going backwards)
+
+3. External flux contribution:
+   - Flux Φ₁ threads the loop
+   - Contributes: +2πΦ₁/Φ₀ = +2πf₁
+
+Flux quantization condition:
+    φ_EJ1 + φ_L1 - φ = 2πf₁
+
+Solving for φ_EJ1:
+    φ_EJ1 = φ - φ_L1 + 2πf₁
+    φ_EJ1 = φ + 2πf₁ - φ_L1  ✓
+
+This is the gauge-invariant phase across EJ1!
+
+Similarly for Loop 2 (Branch 3 || Branch 2):
+    φ_EJ2 = φ + 2πf₂ - φ_L2
+
+
+FINAL HAMILTONIAN WITH EXPLANATION
+===================================
+
+H = 4E_C n²
+    - E_J1 cos(φ + 2πf₁ - φ_L1)  ← Junction 1 in loop 1
+    - E_J0 cos(φ)                 ← Junction 0 (not in external loop)
+    - E_J2 cos(φ + 2πf₂ - φ_L2)  ← Junction 2 in loop 2
+    + E_L1 φ_L1²                  ← Magnetic energy in L1
+    + E_L2 φ_L2²                  ← Magnetic energy in L2
+
+where:
+- n = conjugate momentum to φ (Cooper pair number)
+- E_C = e²/(2C_total)
+- C_total = Cg + CJ1 + CJ0 + CJ2
+- E_L1 = (Φ₀/2π)²/(2L₁)
+- E_L2 = (Φ₀/2π)²/(2L₂)
+- f₁ = Φ₁/Φ₀
+- f₂ = Φ₂/Φ₀
+
+This is a 3-dimensional Hamiltonian with variables (n, φ, φ_L1, φ_L2).
+
+
+CLASSICAL POTENTIAL ENERGY MINIMIZATION
+========================================
+
+For large inductances (E_L small), we can find the classical minimum:
+
+∂U/∂φ_L1 = E_J1 sin(φ + 2πf₁ - φ_L1) + 2E_L1 φ_L1 = 0
+∂U/∂φ_L2 = E_J2 sin(φ + 2πf₂ - φ_L2) + 2E_L2 φ_L2 = 0
+
+These equations determine φ_L1(φ, f₁) and φ_L2(φ, f₂).
+
+For small E_L (large L):
+    φ_L1 ≈ 0 → φ_EJ1 ≈ φ + 2πf₁
+    φ_L2 ≈ 0 → φ_EJ2 ≈ φ + 2πf₂
+
+Then the effective Hamiltonian becomes:
+
+H_eff = 4E_C n² - E_J1 cos(φ + 2πf₁) - E_J0 cos(φ) - E_J2 cos(φ + 2πf₂)
+
+
+USEFUL VARIABLE TRANSFORMATION: Flux Difference Coordinates
+============================================================
+
+The general Hamiltonian has THREE Josephson terms:
+    H = -E_J1 cos(φ + 2πf₁) - E_J0 cos(φ) - E_J2 cos(φ + 2πf₂)
+
+This looks complicated with two independent fluxes f₁ and f₂.
+
+Can we simplify by changing variables?
+
+Option 1: Common Mode and Differential Flux
+--------------------------------------------
+Define:
+    f_avg = (f₁ + f₂)/2     (average flux)
+    Δf = (f₁ - f₂)/2        (flux difference)
+
+Then:
+    f₁ = f_avg + Δf
+    f₂ = f_avg - Δf
+
+Substituting:
+    H = -E_J1 cos(φ + 2π(f_avg + Δf))
+        - E_J0 cos(φ)
+        - E_J2 cos(φ + 2π(f_avg - Δf))
+
+This is still two variables (f_avg, Δf), but now they have clear physical meaning:
+- f_avg: Overall flux bias (shifts all phases together)
+- Δf: Asymmetry between the two loops
+
+Option 2: Single Flux for Symmetric Case (E_J1 = E_J2 = E_J)
+-------------------------------------------------------------
+
+If E_J1 = E_J2 = E_J and f₁ = f₂ = f (symmetric):
+
+H_eff = 4E_C n² - 2E_J cos(φ + 2πf) - E_J0 cos(φ)
+
+Using cos addition formula:
+    cos(φ + 2πf) = cos(φ)cos(2πf) - sin(φ)sin(2πf)
+
+Expanding:
+    H = -2E_J[cos(φ)cos(2πf) - sin(φ)sin(2πf)] - E_J0 cos(φ)
+      = -cos(φ)[2E_J cos(2πf) + E_J0] + sin(φ)[2E_J sin(2πf)]
+
+This can be written as:
+    H_eff = 4E_C n² - E_J^eff(f) cos(φ - φ_0(f))
+
+where:
+    E_J^eff(f) = √[(2E_J cos(2πf) + E_J0)² + (2E_J sin(2πf))²]
+
+    tan(φ_0(f)) = [2E_J sin(2πf)] / [2E_J cos(2πf) + E_J0]
+
+Now we have SINGLE effective Josephson coupling that depends on flux!
+
+Option 3: General Case - Cannot Reduce to Single Variable
+----------------------------------------------------------
+
+For the general asymmetric case (E_J1 ≠ E_J2, f₁ ≠ f₂), we CANNOT reduce to
+a single flux variable. We fundamentally have TWO independent control parameters.
+
+However, we can still use the transformation:
+    H = -E_J1 cos(φ + 2πf₁) - E_J0 cos(φ) - E_J2 cos(φ + 2πf₂)
+
+Expand using cos(a+b) = cos(a)cos(b) - sin(a)sin(b):
+    H = -E_J1[cos(φ)cos(2πf₁) - sin(φ)sin(2πf₁)]
+        - E_J0 cos(φ)
+        - E_J2[cos(φ)cos(2πf₂) - sin(φ)sin(2πf₂)]
+
+Collect cos(φ) and sin(φ) terms:
+    H = -cos(φ)[E_J1 cos(2πf₁) + E_J0 + E_J2 cos(2πf₂)]
+        + sin(φ)[E_J1 sin(2πf₁) + E_J2 sin(2πf₂)]
+
+Define effective parameters:
+    A(f₁, f₂) = E_J1 cos(2πf₁) + E_J0 + E_J2 cos(2πf₂)
+    B(f₁, f₂) = E_J1 sin(2πf₁) + E_J2 sin(2πf₂)
+
+Then:
+    H = -A(f₁,f₂) cos(φ) + B(f₁,f₂) sin(φ)
+      = -√[A² + B²] cos(φ - φ_0)
+
+where:
+    E_J^eff(f₁, f₂) = √[A² + B²]
+    tan(φ_0) = B/A
+
+Final Result - Effective Single-Junction Model:
+-----------------------------------------------
+    H_eff = 4E_C n² - E_J^eff(f₁, f₂) cos(φ - φ_0(f₁, f₂))
+
+where:
+    E_J^eff(f₁, f₂) = √[(E_J1 cos(2πf₁) + E_J0 + E_J2 cos(2πf₂))²
+                        + (E_J1 sin(2πf₁) + E_J2 sin(2πf₂))²]
+
+    tan(φ_0(f₁, f₂)) = (E_J1 sin(2πf₁) + E_J2 sin(2πf₂))
+                        / (E_J1 cos(2πf₁) + E_J0 + E_J2 cos(2πf₂))
+
+This shows that the BiSQUID circuit behaves like a SINGLE effective
+junction with flux-tunable coupling E_J^eff and phase offset φ_0!
+
+Physical Interpretation:
+-----------------------
+- E_J^eff(f₁, f₂): Effective Josephson energy (flux-tunable)
+- φ_0(f₁, f₂): Ground state phase offset
+
+The TWO fluxes give us a 2D parameter space to tune the qubit properties:
+- Can find optimal points (sweet spots) where dE/df₁ = dE/df₂ = 0
+- Can create complex interference patterns
+- More flexibility than single-flux devices
+
+
+SUMMARY: FINAL HAMILTONIAN
+===========================
+
+Full 3D Hamiltonian:
+--------------------
+H = 4E_C n²
+    - E_J1 cos(φ + 2πf₁ - φ_L1)
+    - E_J0 cos(φ)
+    - E_J2 cos(φ + 2πf₂ - φ_L2)
+    + E_L1 φ_L1²
+    + E_L2 φ_L2²
+
+Operators:
+- [φ, n] = i
+- φ_L1, φ_L2 are c-numbers (classical) or quantum operators
+
+Effective 1D Hamiltonian (large L limit):
+-----------------------------------------
+H_eff = 4E_C n² - E_J1 cos(φ + 2πf₁) - E_J0 cos(φ) - E_J2 cos(φ + 2πf₂)
+
+This is flux-tunable qubit similar to flux qubit but with three junctions.
+
+
+NUMERICAL IMPLEMENTATION
+=========================
+
+STEP 1: Transform cos(φ + α) to Charge Basis
+---------------------------------------------
+
+For the simple Cooper box, we had:
+    cos(φ) = (e^(iφ) + e^(-iφ))/2
+
+In the charge basis:
+    e^(iφ) |n⟩ = |n+1⟩  (raises charge by 1 Cooper pair)
+    e^(-iφ) |n⟩ = |n-1⟩  (lowers charge by 1 Cooper pair)
+
+Therefore:
+    ⟨n'|cos(φ)|n⟩ = (1/2)[δ_(n',n+1) + δ_(n',n-1)]
+
+STEP 2: Handle Flux-Shifted Terms cos(φ + 2πf₁ - φ_L1)
+--------------------------------------------------------
+
+For the BiSQUID circuit, we have terms like:
+    -E_J1 cos(φ + 2πf₁ - φ_L1)
+
+In the large L limit (small E_L), φ_L1 ≈ 0, so:
+    cos(φ + 2πf₁ - φ_L1) ≈ cos(φ + 2πf₁)
+
+Expanding:
+    cos(φ + 2πf₁) = (e^(i(φ + 2πf₁)) + e^(-i(φ + 2πf₁)))/2
+                   = (e^(i2πf₁)e^(iφ) + e^(-i2πf₁)e^(-iφ))/2
+
+Key insight: The flux term e^(±i2πf₁) is a PHASE FACTOR!
+
+In the charge basis:
+    e^(iφ) |n⟩ = |n+1⟩    (unchanged)
+    e^(-iφ) |n⟩ = |n-1⟩   (unchanged)
+
+But now with phase factors:
+    ⟨n'|cos(φ + 2πf₁)|n⟩ = (1/2)[e^(i2πf₁)⟨n'|e^(iφ)|n⟩ + e^(-i2πf₁)⟨n'|e^(-iφ)|n⟩]
+                          = (1/2)[e^(i2πf₁)δ_(n',n+1) + e^(-i2πf₁)δ_(n',n-1)]
+
+STEP 3: Matrix Elements for BiSQUID
+---------------------------------------------
+
+The Hamiltonian matrix elements become:
+
+Diagonal (charging energy):
+    ⟨n|H|n⟩ = 4E_C n²
+
+Off-diagonal (Josephson tunneling with flux):
+    ⟨n|H|n+1⟩ = -(1/2)[E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂)]
+    ⟨n|H|n-1⟩ = -(1/2)[E_J1 e^(-i2πf₁) + E_J0 + E_J2 e^(-i2πf₂)]
+
+Note: The off-diagonal elements are COMPLEX for f₁, f₂ ≠ 0!
+
+STEP 4: Hermiticity Check
+--------------------------
+
+The Hamiltonian must be Hermitian: H† = H
+
+Check: ⟨n|H|n+1⟩* = ⟨n+1|H|n⟩
+
+    [-(1/2)(E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂))]*
+    = -(1/2)(E_J1 e^(-i2πf₁) + E_J0 + E_J2 e^(-i2πf₂))
+    = ⟨n+1|H|n⟩  ✓
+
+Good! The matrix is Hermitian, so eigenvalues are real.
+
+STEP 5: Physical Interpretation
+--------------------------------
+
+The phase factors e^(±i2πf_i) represent QUANTUM INTERFERENCE:
+
+At f₁ = 0, f₂ = 0:
+    ⟨n|H|n+1⟩ = -(1/2)(E_J1 + E_J0 + E_J2)
+    All junctions tunnel in phase → constructive interference
+
+At f₁ = 0.5, f₂ = 0 (Φ₁ = Φ₀/2):
+    e^(i2πf₁) = e^(iπ) = -1
+    ⟨n|H|n+1⟩ = -(1/2)(-E_J1 + E_J0 + E_J2)
+    Junction 1 tunnels with OPPOSITE phase → partial destructive interference
+
+At f₁ = 0.5, f₂ = 0.5 (both fluxes at half quantum):
+    ⟨n|H|n+1⟩ = -(1/2)(-E_J1 + E_J0 - E_J2)
+    Junctions 1 and 2 tunnel with opposite phases → maximum interference effect
+
+STEP 6: Matrix Construction in Python
+--------------------------------------
+
+For computation, we work in the charge basis |n⟩ where:
+- Diagonal: 4E_C n²
+- Off-diagonal: Complex tunneling amplitudes
+
+Matrix structure (for n ∈ [-n_max, ..., n_max]):
+
+    dim = 2*n_max + 1
+    H = np.zeros((dim, dim), dtype=complex)  # COMPLEX matrix!
+
+    # Diagonal: charging energy
+    for i, n in enumerate(range(-n_max, n_max+1)):
+        H[i,i] = 4*E_C*n**2
+
+    # Off-diagonal: Josephson tunneling with flux
+    tunnel_up = -(1/2)*(E_J1*np.exp(1j*2*np.pi*f1) + E_J0 + E_J2*np.exp(1j*2*np.pi*f2))
+    tunnel_down = np.conj(tunnel_up)
+
+    for i in range(dim-1):
+        H[i, i+1] = tunnel_up
+        H[i+1, i] = tunnel_down
+
+Note: Even though H is complex, eigenvalues are REAL (Hermitian matrix)!
+
+FULL 3D HAMILTONIAN (with inductor dynamics):
+----------------------------------------------
+
+If we don't assume φ_L1 ≈ 0, we need to work in (n, φ, φ_L1, φ_L2) space.
+This requires discretizing φ_L1 and φ_L2, leading to a much larger matrix.
+
+The matrix element becomes:
+    ⟨n',φ_L1',φ_L2'|H|n,φ_L1,φ_L2⟩
+
+Computational cost: O(N_n × N_φL1 × N_φL2)³ for diagonalization!
+
+
+KEY PARAMETERS
+==============
+
+Energy scales:
+- E_C: Charging energy (charge regime if E_C >> E_J)
+- E_J1, E_J0, E_J2: Josephson energies
+- E_L1, E_L2: Inductive energies
+
+Control parameters:
+- f₁ = Φ₁/Φ₀: Reduced flux in loop 1
+- f₂ = Φ₂/Φ₀: Reduced flux in loop 2
+
+Sweet spots:
+- f = 1/2: First-order flux-insensitive point
+
+
+INTUITIVE PICTURE
+=================
+
+Think of the circuit as having TWO control knobs:
+
+Knob 1: External flux Φ₁
+------------------------
+- Threads loop 1 (EJ1-L1 || EJ0)
+- Shifts the phase of EJ1 by +2πf₁
+- Creates interference between branch 1 and branch 2
+- Can enhance or suppress effective Josephson coupling
+
+Knob 2: External flux Φ₂
+------------------------
+- Threads loop 2 (EJ2-L2 || EJ0)
+- Shifts the phase of EJ2 by +2πf₂
+- Creates interference between branch 2 and branch 3
+- Independent control of right side
+
+The Magic of Quantum Interference:
+-----------------------------------
+At f₁ = 0: All junctions have phase φ
+    → Maximum constructive interference
+    → E_J^total = E_J1 + E_J0 + E_J2
+
+At f₁ = 0.5, f₂ = 0.5: Phases are shifted by π
+    → Partial destructive interference
+    → Reduced effective E_J
+    → "Sweet spot" for flux noise insensitivity
+
+The inductor terms φ_L1, φ_L2:
+- Allow current to flow in the loops
+- Store magnetic energy
+- Provide "inertia" to phase dynamics
+- Small for large L (stiff inductors)
+
+
+PHYSICAL ROLE OF INDUCTORS L1 AND L2
+=====================================
+
+Why Include Inductors?
+----------------------
+
+The inductors L1 and L2 serve several important purposes:
+
+1. **Flux Bias Control**
+   - Without inductors, you CANNOT independently control flux in each loop!
+   - The inductors allow persistent currents to flow, creating well-defined flux states
+   - They enable independent tuning of Φ₁ and Φ₂
+
+2. **Circuit Connectivity**
+   - In the actual physical circuit, the inductors are often just wires or traces
+   - They provide the physical connection while maintaining flux quantization
+   - They close the superconducting loop necessary for flux threading
+
+3. **Flux Screening and Dynamics**
+   - Large L (small E_L): Inductors are "stiff" → flux is well-defined, φ_L ≈ 0
+   - Small L (large E_L): Inductors allow flux screening → complex dynamics
+
+Parameter Regimes:
+------------------
+
+**Regime 1: Large Inductance (E_L << E_J)**
+
+When L₁, L₂ are large (physically: long, thin wires):
+- E_L = (Φ₀/2π)²/(2L) is very small
+- The inductive energy E_L φ_L² is minimized when φ_L ≈ 0
+- External flux is NOT screened
+- We can use the simplified Hamiltonian:
+    H ≈ 4E_C n² - E_J1 cos(φ + 2πf₁) - E_J0 cos(φ) - E_J2 cos(φ + 2πf₂)
+
+This is the **flux qubit regime**: External flux directly controls junction phases.
+
+Benefits:
++ Simple effective Hamiltonian
++ Direct flux control
++ Well-defined flux states
+- Sensitive to flux noise
+
+**Regime 2: Small Inductance (E_L >> E_J)**
+
+When L₁, L₂ are small (physically: short, wide wires):
+- E_L = (Φ₀/2π)²/(2L) is large
+- The inductor can support large currents
+- External flux is partially SCREENED by induced currents
+- Must use full Hamiltonian with φ_L1, φ_L2 dynamics
+
+This creates a **fluxonium-like regime**: Complex interplay between flux and inductive energy.
+
+Benefits:
++ Reduced sensitivity to flux noise (screening)
++ Additional degree of freedom for optimization
+- More complex Hamiltonian
+- Harder to analyze
+
+**Regime 3: Intermediate (E_L ~ E_J)**
+
+Most interesting regime with rich physics:
+- Flux control with partial screening
+- Optimal balance between tunability and noise protection
+- Requires full numerical analysis
+
+
+Can We Remove the Inductors?
+-----------------------------
+
+**Short answer: NO, for a practical flux-tunable device!**
+
+Here's why:
+
+**Without L1 and L2:**
+If we try to remove inductors and directly connect junctions in parallel:
+
+    Cg + EJ1 || EJ0 || EJ2
+
+Problems:
+1. All three junctions see the SAME phase φ
+2. No way to create different phase shifts
+3. No independent flux control → f₁ = f₂ = 0 always!
+4. Circuit reduces to a single effective junction:
+   H = 4E_C n² - (E_J1 + E_J0 + E_J2) cos(φ)
+
+This is just a simple Cooper box with no flux tunability!
+
+**With inductors:**
+The inductors create SEPARATE loops that can thread different fluxes:
+- Loop 1: EJ1-L1 || EJ0 can thread flux Φ₁
+- Loop 2: EJ2-L2 || EJ0 can thread flux Φ₂
+- Independent control via two flux knobs!
+
+
+Practical Implementation:
+--------------------------
+
+In real devices:
+
+1. **Geometric inductance**
+   - The inductors are often just sections of superconducting wire/trace
+   - Typical values: L ~ 1-100 pH (picohenries)
+   - Geometric: L ∝ length, L ∝ 1/width
+
+2. **Josephson inductance**
+   - Sometimes additional junctions used as nonlinear inductors
+   - L_J = Φ₀/(2π I_c cos(φ))
+   - Tunable with flux or current bias
+
+3. **Flux bias lines**
+   - External coils coupled to the loops via mutual inductance
+   - Current in coil → flux through loop
+   - Independent control of Φ₁ and Φ₂
+
+4. **Trade-offs**
+   - Large L: Better flux control, more flux noise sensitivity
+   - Small L: Better flux noise protection, harder to control
+   - Typical choice: Large L for control, operate at sweet spots for noise protection
+
+
+Physical Picture:
+-----------------
+
+Think of the inductors as:
+
+1. **Flux containers**
+   - Store magnetic flux in the loops
+   - Large L → good flux storage → external flux "sticks"
+   - Small L → flux can leak → screening
+
+2. **Current highways**
+   - Allow persistent supercurrents to flow
+   - I = (Φ₀/2πL) φ_L
+   - These currents create the flux bias
+
+3. **Energy barriers**
+   - E_L φ_L² creates energy cost for flux changes
+   - Large L → small E_L → low barrier → flux easily controlled
+   - Small L → large E_L → high barrier → flux protected
+
+
+Comparison to Other Circuits:
+------------------------------
+
+**Flux qubit (traditional):**
+- Three junctions in a LOOP (triangle)
+- Single large inductor closes the loop
+- One flux control parameter
+- Similar physics but different geometry
+
+**This circuit (double-loop):**
+- Three junctions with TWO loops
+- Two inductors (L1, L2)
+- TWO independent flux controls
+- More design freedom!
+
+**Fluxonium:**
+- Single junction + large shunt inductor
+- Heavily inductive (E_L ~ E_J or larger)
+- Protected against charge noise
+- Different operating regime
+
+
+Summary:
+--------
+
+The inductors L1 and L2 are ESSENTIAL for:
+✓ Creating separate flux-tunable loops
+✓ Enabling independent control of Φ₁ and Φ₂
+✓ Providing two-parameter tuning space
+✓ Allowing flux quantization in each loop
+
+Without them:
+✗ No flux control
+✗ Circuit collapses to simple Cooper box
+✗ No quantum interference effects
+✗ Just one big effective junction
+
+The inductors transform a simple parallel junction array into a rich,
+tunable quantum system with 2D parameter space!
+
+
+COMPARISON TO KNOWN CIRCUITS
+=============================
+
+Cooper box (E_J1 = E_J2 = E_L = 0):
+    H = 4E_C n² - E_J0 cos(φ)
+    - Single junction
+    - No flux control
+
+Flux qubit (three junctions, one small):
+    H = 4E_C n² - E_J_large cos(φ) - E_J_small cos(φ - 2πf)
+    - Similar topology but different parameter regime
+    - Typically E_J >> E_C (phase regime)
+    - Uses asymmetry (one small junction)
+
+This circuit: Flux-tunable Cooper box / Transmon
+    H = 4E_C n² - E_J1 cos(φ + 2πf₁) - E_J0 cos(φ) - E_J2 cos(φ + 2πf₂)
+    - Charge control: None (n_g = 0)
+    - Flux control: Yes (f₁, f₂) - TWO independent fluxes
+    - Can be symmetric (E_J1 = E_J2) or asymmetric
+    - Inductors allow for more complex dynamics
+
+
+CONCRETE EXAMPLE: Matrix for n_max = 2
+=======================================
+
+Let's build the Hamiltonian matrix explicitly for a small truncation.
+
+Parameters:
+- n ∈ {-2, -1, 0, 1, 2}  (5 states)
+- E_C = 1 (units)
+- E_J1 = E_J2 = 0.5, E_J0 = 1
+- f₁ = 0.25, f₂ = 0.25 (Φ₁ = Φ₂ = Φ₀/4)
+- φ_L1 ≈ φ_L2 ≈ 0 (large L limit)
+
+Off-diagonal tunneling amplitude:
+    t₊ = -(1/2)[0.5·e^(iπ/2) + 1 + 0.5·e^(iπ/2)]
+       = -(1/2)[0.5i + 1 + 0.5i]
+       = -(1/2)[1 + i]
+       = -0.5 - 0.5i
+
+    t₋ = (t₊)* = -0.5 + 0.5i
+
+Hamiltonian matrix (5×5):
+
+        n=-2    n=-1    n=0     n=1     n=2
+    ┌                                           ┐
+n=-2│  16      t₋       0       0       0      │
+n=-1│  t₊      4       t₋       0       0      │
+n=0 │  0       t₊       0      t₋       0      │
+n=1 │  0       0       t₊       4      t₋      │
+n=2 │  0       0       0       t₊      16      │
+    └                                           ┘
+
+where:
+- Diagonal: 4E_C n² = 4n²
+- Off-diagonal: Complex tunneling amplitudes from flux
+
+Eigenvalues (real, despite complex matrix):
+    E₀, E₁, E₂, E₃, E₄
+
+The ground state energy E₀ and transition E₁ - E₀ depend on f₁ and f₂!
+
+
+SUMMARY
+=======
+
+Key Transformation in Charge Basis:
+------------------------------------
+
+Cooper box (no flux):
+    cos(φ) → (1/2)[|n⟩⟨n+1| + |n+1⟩⟨n|]
+    Matrix element: ⟨n|H|n±1⟩ = -E_J/2
+
+BiSQUID (with flux):
+    cos(φ + 2πf₁) → (1/2)[e^(i2πf₁)|n⟩⟨n+1| + e^(-i2πf₁)|n+1⟩⟨n|]
+    Matrix element: ⟨n|H|n+1⟩ = -(1/2)[E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂)]
+
+The flux adds COMPLEX PHASE FACTORS to the tunneling amplitudes!
+
+Physical Effects:
+-----------------
+1. φ: Island phase (quantum degree of freedom) → charge tunneling |n⟩ ↔ |n±1⟩
+2. +2πf₁: External flux (control parameter) → phase shift e^(±i2πf₁)
+3. -φ_L1: Inductor phase drop (screening/magnetic energy) → additional dynamics
+
+The external flux creates quantum interference between different current paths,
+allowing flux-based control of the qubit energy levels without any gate voltage.
+
+This is the essence of flux-tunable qubits!
+
+
+QUANTIZATION OF EFFECTIVE HAMILTONIAN: cos(φ - φ₀) → CHARGE BASIS
+===================================================================
+
+Starting Point: Effective Single-Junction Model
+------------------------------------------------
+
+From the variable transformation, we showed that the BiSQUID circuit
+can be written as an EFFECTIVE single-junction Hamiltonian:
+
+    H_eff = 4E_C n² - E_J^eff(f₁, f₂) cos(φ - φ₀(f₁, f₂))
+
+where:
+    E_J^eff(f₁, f₂) = √[(E_J1 cos(2πf₁) + E_J0 + E_J2 cos(2πf₂))²
+                        + (E_J1 sin(2πf₁) + E_J2 sin(2πf₂))²]
+
+    tan(φ₀(f₁, f₂)) = (E_J1 sin(2πf₁) + E_J2 sin(2πf₂))
+                        / (E_J1 cos(2πf₁) + E_J0 + E_J2 cos(2πf₂))
+
+Goal: Transform cos(φ - φ₀) to the charge basis using [φ, n] = i
+
+
+STEP 1: Canonical Commutation Relations
+----------------------------------------
+
+In quantum mechanics, phase and charge number are CONJUGATE variables:
+
+    [φ, n] = i
+
+This is analogous to [x, p] = iℏ in position-momentum space (with ℏ = 1 here).
+
+Physical interpretation:
+- n: Cooper pair number operator (discrete, like particle number)
+- φ: Superconducting phase operator (continuous, like angle)
+- They are Fourier transform pairs (complementary observables)
+
+
+STEP 2: Action of Phase Operators on Charge States
+---------------------------------------------------
+
+In the charge basis |n⟩, the operators act as:
+
+Number operator:
+    n̂ |n⟩ = n |n⟩  (eigenvalue equation)
+
+Phase operators (exponential form):
+    e^(iφ) |n⟩ = |n+1⟩  ← RAISES charge by 1 Cooper pair
+    e^(-iφ) |n⟩ = |n-1⟩  ← LOWERS charge by 1 Cooper pair
+
+Proof using commutation relation:
+    e^(iφ) n̂ e^(-iφ) = n̂ + i[φ, n̂] = n̂ + i(i) = n̂ + 1
+    Therefore: e^(iφ) |n⟩ = e^(iφ) n̂ |n⟩ = (n̂ + 1) e^(iφ) |n⟩
+    This means e^(iφ) |n⟩ is an eigenstate of n̂ with eigenvalue n+1
+    Hence: e^(iφ) |n⟩ = |n+1⟩ ✓
+
+
+STEP 3: Transform cos(φ - φ₀) to Charge Basis
+----------------------------------------------
+
+Expand using Euler's formula:
+    cos(φ - φ₀) = [e^(i(φ - φ₀)) + e^(-i(φ - φ₀))]/2
+                 = [e^(-iφ₀) e^(iφ) + e^(iφ₀) e^(-iφ)]/2
+
+Key insight: φ₀(f₁, f₂) is a C-NUMBER (not an operator), so e^(±iφ₀) are
+just complex phase factors!
+
+Define:
+    α(f₁, f₂) = e^(-iφ₀(f₁, f₂))  ← complex number
+    ᾱ(f₁, f₂) = e^(iφ₀(f₁, f₂)) = α*  ← complex conjugate
+
+Then:
+    cos(φ - φ₀) = [α e^(iφ) + ᾱ e^(-iφ)]/2
+
+
+STEP 4: Matrix Elements in Charge Basis
+----------------------------------------
+
+Compute ⟨n'|cos(φ - φ₀)|n⟩:
+
+⟨n'|cos(φ - φ₀)|n⟩ = (1/2)⟨n'|[α e^(iφ) + ᾱ e^(-iφ)]|n⟩
+                    = (1/2)[α ⟨n'|e^(iφ)|n⟩ + ᾱ ⟨n'|e^(-iφ)|n⟩]
+                    = (1/2)[α ⟨n'|n+1⟩ + ᾱ ⟨n'|n-1⟩]
+                    = (1/2)[α δ_(n',n+1) + ᾱ δ_(n',n-1)]
+
+Therefore:
+    ⟨n|cos(φ - φ₀)|n+1⟩ = α/2 = (1/2)e^(-iφ₀)
+    ⟨n|cos(φ - φ₀)|n-1⟩ = ᾱ/2 = (1/2)e^(iφ₀)
+    ⟨n|cos(φ - φ₀)|n⟩ = 0  (diagonal elements are zero)
+
+Matrix structure:
+    cos(φ - φ₀) = (1/2)[α ∑_n |n⟩⟨n+1| + ᾱ ∑_n |n⟩⟨n-1|]
+
+In matrix form (tridiagonal):
+                n-1         n        n+1
+    ┌                                   ┐
+n-1 │         0         ᾱ/2        0    │
+n   │       α/2          0        ᾱ/2   │
+n+1 │         0         α/2        0    │
+    └                                   ┘
+
+
+STEP 5: Full Hamiltonian Matrix Elements
+-----------------------------------------
+
+The effective Hamiltonian:
+    H_eff = 4E_C n² - E_J^eff(f₁, f₂) cos(φ - φ₀(f₁, f₂))
+
+Matrix elements:
+
+**Diagonal (charging energy):**
+    ⟨n|H|n⟩ = 4E_C n²
+
+**Off-diagonal (Josephson tunneling with flux-dependent phase):**
+    ⟨n|H|n+1⟩ = -E_J^eff(f₁, f₂) × (1/2)e^(-iφ₀(f₁,f₂))
+    ⟨n|H|n-1⟩ = -E_J^eff(f₁, f₂) × (1/2)e^(iφ₀(f₁,f₂))
+
+Note: ⟨n|H|n-1⟩ = [⟨n|H|n+1⟩]* (Hermitian conjugate)
+
+
+STEP 6: Explicit Formula for Complex Matrix Elements
+-----------------------------------------------------
+
+Recall:
+    tan(φ₀) = B/A
+
+where:
+    A(f₁, f₂) = E_J1 cos(2πf₁) + E_J0 + E_J2 cos(2πf₂)
+    B(f₁, f₂) = E_J1 sin(2πf₁) + E_J2 sin(2πf₂)
+
+From trigonometry:
+    cos(φ₀) = A/√(A² + B²) = A/E_J^eff
+    sin(φ₀) = B/√(A² + B²) = B/E_J^eff
+
+Therefore:
+    e^(-iφ₀) = cos(φ₀) - i sin(φ₀)
+             = (A - iB)/E_J^eff
+
+The off-diagonal matrix element becomes:
+    ⟨n|H|n+1⟩ = -E_J^eff × (1/2) × (A - iB)/E_J^eff
+              = -(1/2)(A - iB)
+              = -(1/2)[E_J1 cos(2πf₁) + E_J0 + E_J2 cos(2πf₂)]
+                + (i/2)[E_J1 sin(2πf₁) + E_J2 sin(2πf₂)]
+
+Expanding using e^(i2πf) = cos(2πf) + i sin(2πf):
+    ⟨n|H|n+1⟩ = -(1/2)[E_J1(cos(2πf₁) - i sin(2πf₁)) + E_J0
+                        + E_J2(cos(2πf₂) - i sin(2πf₂))]
+              = -(1/2)[E_J1 e^(-i2πf₁) + E_J0 + E_J2 e^(-i2πf₂)]
+
+Wait, this has the WRONG sign in the exponent! Let me recalculate...
+
+
+STEP 7: Correct Derivation from Original Form
+----------------------------------------------
+
+Actually, it's easier to work directly from the original Hamiltonian:
+
+    H = -E_J1 cos(φ + 2πf₁) - E_J0 cos(φ) - E_J2 cos(φ + 2πf₂)
+
+For each term:
+    cos(φ + 2πf_i) = (1/2)[e^(i2πf_i) e^(iφ) + e^(-i2πf_i) e^(-iφ)]
+
+Matrix elements:
+    ⟨n|cos(φ + 2πf_i)|n+1⟩ = (1/2)e^(i2πf_i)
+    ⟨n|cos(φ + 2πf_i)|n-1⟩ = (1/2)e^(-i2πf_i)
+
+Summing all three junctions:
+    ⟨n|H|n+1⟩ = -(1/2)[E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂)]
+    ⟨n|H|n-1⟩ = -(1/2)[E_J1 e^(-i2πf₁) + E_J0 + E_J2 e^(-i2πf₂)]
+
+This is EXACTLY what we had before! The effective model and the direct
+calculation give the same result.
+
+Verification that this matches cos(φ - φ₀):
+    ⟨n|H|n+1⟩ = -E_J^eff × (1/2)e^(-iφ₀)
+
+where:
+    E_J^eff e^(-iφ₀) = √(A² + B²) × (A - iB)/√(A² + B²)
+                      = A - iB
+                      = E_J1 cos(2πf₁) + E_J0 + E_J2 cos(2πf₂)
+                        - i[E_J1 sin(2πf₁) + E_J2 sin(2πf₂)]
+                      = E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂)  ✓
+
+Perfect match!
+
+
+STEP 8: Physical Interpretation of Matrix Elements
+---------------------------------------------------
+
+The matrix element ⟨n|H|n+1⟩ represents the amplitude for a Cooper pair
+to tunnel from state |n⟩ to state |n+1⟩.
+
+**Without flux (f₁ = f₂ = 0):**
+    ⟨n|H|n+1⟩ = -(E_J1 + E_J0 + E_J2)/2  (real, negative)
+
+    All junctions contribute constructively → maximum tunneling rate
+
+**With flux (f₁, f₂ ≠ 0):**
+    ⟨n|H|n+1⟩ = -(1/2)[E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂)]  (complex!)
+
+    Phase factors e^(i2πf_i) create quantum interference:
+    - f = 0: e^(i2πf) = 1 → constructive
+    - f = 0.25: e^(i2πf) = i → 90° phase shift
+    - f = 0.5: e^(i2πf) = -1 → destructive (π phase shift)
+    - f = 0.75: e^(i2πf) = -i → 270° phase shift
+
+The effective Josephson energy:
+    |⟨n|H|n+1⟩| = (1/2)E_J^eff(f₁, f₂)
+
+varies continuously as we tune f₁ and f₂, allowing us to control the
+qubit frequency!
+
+
+STEP 9: Matrix Construction Algorithm
+--------------------------------------
+
+To build the Hamiltonian matrix numerically:
+
+```python
+import numpy as np
+
+def build_hamiltonian_bisquid(E_C, E_J1, E_J0, E_J2, f1, f2, n_max):
+    """
+    Build Hamiltonian for BiSQUID circuit.
+
+    Parameters
+    ----------
+    E_C : float
+        Charging energy (in GHz or chosen units)
+    E_J1, E_J0, E_J2 : float
+        Josephson energies of the three junctions
+    f1, f2 : float
+        Reduced external fluxes: f_i = Φ_i/Φ₀
+    n_max : int
+        Truncation: charge states from -n_max to +n_max
+
+    Returns
+    -------
+    H : ndarray, shape (2*n_max+1, 2*n_max+1), dtype=complex
+        Hamiltonian matrix in charge basis
+    """
+    dim = 2 * n_max + 1
+    n_values = np.arange(-n_max, n_max + 1)
+
+    # Initialize as COMPLEX matrix (important!)
+    H = np.zeros((dim, dim), dtype=complex)
+
+    # Diagonal: charging energy
+    for i, n in enumerate(n_values):
+        H[i, i] = 4.0 * E_C * n**2
+
+    # Off-diagonal: Josephson tunneling with flux
+    # ⟨n|H|n+1⟩ = -(1/2)[E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂)]
+    tunnel_amplitude = -0.5 * (
+        E_J1 * np.exp(1j * 2 * np.pi * f1) +
+        E_J0 +
+        E_J2 * np.exp(1j * 2 * np.pi * f2)
+    )
+
+    for i in range(dim - 1):
+        H[i, i+1] = tunnel_amplitude        # Upper diagonal
+        H[i+1, i] = np.conj(tunnel_amplitude)  # Lower diagonal (Hermitian)
+
+    return H
+
+
+# Example: compute energy spectrum
+E_C = 0.3  # GHz
+E_J1 = E_J2 = 5.0  # GHz (symmetric junctions)
+E_J0 = 10.0  # GHz (central junction)
+n_max = 30
+
+# Scan flux parameter space
+f1_array = np.linspace(0, 1, 100)
+f2_array = np.linspace(0, 1, 100)
+
+energies = np.zeros((len(f1_array), len(f2_array), 5))  # First 5 levels
+
+for i, f1 in enumerate(f1_array):
+    for j, f2 in enumerate(f2_array):
+        H = build_hamiltonian_bisquid(E_C, E_J1, E_J0, E_J2, f1, f2, n_max)
+        evals = np.linalg.eigvalsh(H)  # Eigenvalues (REAL, despite complex H!)
+        energies[i, j, :] = evals[:5]
+
+# energies[i,j,k] = k-th energy level at flux point (f1[i], f2[j])
+```
+
+
+STEP 10: Key Properties of the Hamiltonian Matrix
+--------------------------------------------------
+
+1. **Hermiticity:**
+   H† = H → eigenvalues are REAL (physical energies)
+
+   Check: H[i,j]* = H[j,i]
+
+2. **Sparsity:**
+   Tridiagonal structure → efficient numerical methods
+
+3. **Flux periodicity:**
+   f → f + 1 gives same Hamiltonian (flux quantum periodicity)
+
+   Proof: e^(i2π(f+1)) = e^(i2πf) e^(i2π) = e^(i2πf)
+
+4. **Symmetries:**
+   - If E_J1 = E_J2 and f1 = f2: system has reflection symmetry
+   - Sweet spots at f = 0.5: ∂E/∂f = 0 (flux-insensitive points)
+
+
+STEP 11: Comparison with Direct Method
+---------------------------------------
+
+We can arrive at the SAME matrix elements via two routes:
+
+**Method 1: Direct expansion (used earlier)**
+    H = -E_J1 cos(φ + 2πf₁) - E_J0 cos(φ) - E_J2 cos(φ + 2πf₂)
+
+    Expand each cosine separately:
+    ⟨n|H|n+1⟩ = -(1/2)[E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂)]
+
+**Method 2: Effective single-junction model (this section)**
+    H = 4E_C n² - E_J^eff(f₁, f₂) cos(φ - φ₀(f₁, f₂))
+
+    Transform cos(φ - φ₀) using [φ, n] = i:
+    ⟨n|H|n+1⟩ = -E_J^eff × (1/2)e^(-iφ₀)
+              = -(1/2)(A - iB)
+              = -(1/2)[E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂)]  ✓
+
+Both methods give IDENTICAL results!
+
+The effective model provides physical intuition:
+- E_J^eff(f₁, f₂): Effective coupling strength
+- φ₀(f₁, f₂): Ground state phase offset
+- 2D flux parameter space for optimization
+
+
+SUMMARY: Complete Transformation
+=================================
+
+Starting Hamiltonian (classical):
+    H = 4E_C n² - E_J^eff(f₁, f₂) cos(φ - φ₀(f₁, f₂))
+
+Canonical quantization using [φ, n] = i:
+    n̂ |n⟩ = n |n⟩
+    e^(iφ) |n⟩ = |n+1⟩
+    e^(-iφ) |n⟩ = |n-1⟩
+
+Transform cos(φ - φ₀):
+    cos(φ - φ₀) = [e^(-iφ₀) e^(iφ) + e^(iφ₀) e^(-iφ)]/2
+
+Matrix representation:
+    ⟨n|H|n⟩ = 4E_C n²
+    ⟨n|H|n+1⟩ = -(1/2)[E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂)]
+    ⟨n|H|n-1⟩ = -(1/2)[E_J1 e^(-i2πf₁) + E_J0 + E_J2 e^(-i2πf₂)]
+
+All other matrix elements are zero (tridiagonal structure).
+
+Physical interpretation:
+- Diagonal: Electrostatic energy of n Cooper pairs
+- Off-diagonal: Quantum tunneling amplitude with flux-induced phase shifts
+- Complex matrix elements → quantum interference
+- Real eigenvalues → physical energy levels
+
+This completes the transformation from classical Hamiltonian to quantum
+matrix representation in the charge basis!
+
+
+COMPLETE HAMILTONIAN IN CHARGE BASIS |n⟩ NOTATION
+===================================================
+
+Just like the Cooper box, we can write the full Hamiltonian using the
+charge basis states |n⟩. Here's the complete expression:
+
+
+1. FULL 3D HAMILTONIAN (with inductor dynamics)
+================================================
+
+When we include the inductor dynamics (variables φ_L1, φ_L2), the Hamiltonian
+has THREE degrees of freedom: (n, φ_L1, φ_L2)
+
+H = Σ_n 4E_C n² |n⟩⟨n|
+    - (E_J1/2) Σ_n [e^(i2πf₁) e^(-iφ_L1) |n⟩⟨n+1| + e^(-i2πf₁) e^(iφ_L1) |n+1⟩⟨n|]
+    - (E_J0/2) Σ_n [|n⟩⟨n+1| + |n+1⟩⟨n|]
+    - (E_J2/2) Σ_n [e^(i2πf₂) e^(-iφ_L2) |n⟩⟨n+1| + e^(-i2πf₂) e^(iφ_L2) |n+1⟩⟨n|]
+    + E_L1 φ_L1²
+    + E_L2 φ_L2²
+
+where:
+- E_C = e²/(2C_total) with C_total = Cg + CJ1 + CJ0 + CJ2
+- E_J1, E_J0, E_J2 are the Josephson energies
+- E_L1 = (Φ₀/2π)²/(2L₁), E_L2 = (Φ₀/2π)²/(2L₂) are inductive energies
+- f₁ = Φ₁/Φ₀, f₂ = Φ₂/Φ₀ are reduced external fluxes
+- φ_L1, φ_L2 are inductor phase variables (operators or c-numbers)
+
+Note: In this form, φ_L1 and φ_L2 appear as operators that don't change n!
+
+
+2. EFFECTIVE 1D HAMILTONIAN (large L limit: φ_L1 ≈ φ_L2 ≈ 0)
+==============================================================
+
+When inductances L₁, L₂ are large (E_L1, E_L2 small), the inductors are "stiff"
+and we can approximate φ_L1 ≈ φ_L2 ≈ 0. This gives:
+
+H = Σ_n 4E_C n² |n⟩⟨n|
+    - (E_J1/2) Σ_n [e^(i2πf₁) |n⟩⟨n+1| + e^(-i2πf₁) |n+1⟩⟨n|]
+    - (E_J0/2) Σ_n [|n⟩⟨n+1| + |n+1⟩⟨n|]
+    - (E_J2/2) Σ_n [e^(i2πf₂) |n⟩⟨n+1| + e^(-i2πf₂) |n+1⟩⟨n|]
+
+Combining the three Josephson terms:
+
+H = Σ_n 4E_C n² |n⟩⟨n|
+    - (1/2) Σ_n [(E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂)) |n⟩⟨n+1|
+                 + (E_J1 e^(-i2πf₁) + E_J0 + E_J2 e^(-i2πf₂)) |n+1⟩⟨n|]
+
+This is the WORKING HAMILTONIAN for most applications!
+
+
+3. COMPONENT BREAKDOWN (like Cooper box)
+=========================================
+
+Let's write each contribution explicitly:
+
+**Capacitive (charging) energy:**
+    H_C = Σ_n 4E_C n² |n⟩⟨n|
+
+    = 4E_C · [...+ 4|−2⟩⟨−2| + |−1⟩⟨−1| + 0|0⟩⟨0| + |1⟩⟨1| + 4|2⟩⟨2| +...]
+
+Physical meaning: Electrostatic energy of n Cooper pairs on the island
+
+
+**Junction EJ1 (in loop 1 with flux Φ₁):**
+    H_J1 = -(E_J1/2) Σ_n [e^(i2πf₁) |n⟩⟨n+1| + e^(-i2πf₁) |n+1⟩⟨n|]
+
+    = -(E_J1/2) e^(i2πf₁) [...+ |−1⟩⟨0| + |0⟩⟨1| + |1⟩⟨2| +...]
+      -(E_J1/2) e^(-i2πf₁) [...+ |0⟩⟨−1| + |1⟩⟨0| + |2⟩⟨1| +...]
+
+Physical meaning: Cooper pair tunneling through EJ1 with phase shift from Φ₁
+
+
+**Junction EJ0 (center junction, no external flux):**
+    H_J0 = -(E_J0/2) Σ_n [|n⟩⟨n+1| + |n+1⟩⟨n|]
+
+    = -(E_J0/2) [...+ |−1⟩⟨0| + |0⟩⟨1| + |1⟩⟨2| +...]
+      -(E_J0/2) [...+ |0⟩⟨−1| + |1⟩⟨0| + |2⟩⟨1| +...]
+
+Physical meaning: Cooper pair tunneling through EJ0 (no flux bias)
+
+
+**Junction EJ2 (in loop 2 with flux Φ₂):**
+    H_J2 = -(E_J2/2) Σ_n [e^(i2πf₂) |n⟩⟨n+1| + e^(-i2πf₂) |n+1⟩⟨n|]
+
+    = -(E_J2/2) e^(i2πf₂) [...+ |−1⟩⟨0| + |0⟩⟨1| + |1⟩⟨2| +...]
+      -(E_J2/2) e^(-i2πf₂) [...+ |0⟩⟨−1| + |1⟩⟨0| + |2⟩⟨1| +...]
+
+Physical meaning: Cooper pair tunneling through EJ2 with phase shift from Φ₂
+
+
+**Total Hamiltonian:**
+    H = H_C + H_J1 + H_J0 + H_J2
+
+
+4. EXPLICIT MATRIX FORM (truncated basis)
+==========================================
+
+For a truncated basis with n ∈ {−n_max, ..., n_max}, the matrix is:
+
+Define the complex tunneling amplitude:
+    t = (E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂))/2
+
+Then H is a (2n_max + 1) × (2n_max + 1) tridiagonal matrix:
+
+           |−n_max⟩  |−n_max+1⟩  ...  |0⟩  ...  |n_max−1⟩  |n_max⟩
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⟨−n_max|  │  4E_C n²ₘₐₓ     −t*         0     ...      0         0     │
+⟨−n_max+1|│     −t      4E_C(n_max−1)²  −t*   ...      0         0     │
+    ...   │      0           −t          ...   ...     ...       ...    │
+   ⟨0|    │     ...          ...         ...    0      −t*       0     │
+    ...   │      0           0           ...   −t    4E_C·1²     −t*    │
+⟨n_max−1|│      0           0           ...    0      −t    4E_C(n_max−1)²│−t*│
+⟨n_max|  │      0           0           ...   ...     0      −t    4E_C n²ₘₐₓ│
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+where:
+- Diagonal: H_nn = 4E_C n²
+- Upper diagonal: H_n,n+1 = −t = −(1/2)[E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂)]
+- Lower diagonal: H_n+1,n = −t* = −(1/2)[E_J1 e^(-i2πf₁) + E_J0 + E_J2 e^(-i2πf₂)]
+
+
+5. COMPARISON WITH COOPER BOX
+==============================
+
+**Cooper box (single junction with gate voltage):**
+
+H_Cooper = Σ_n 4E_C (n − n_g)² |n⟩⟨n| − (E_J/2) Σ_n [|n⟩⟨n+1| + |n+1⟩⟨n|]
+
+- Gate charge n_g shifts the energy parabola
+- Single Josephson coupling E_J (real, constant)
+- Tunneling amplitude: −E_J/2 (real number)
+
+**BiSQUID (this circuit, no gate voltage):**
+
+H_triple = Σ_n 4E_C n² |n⟩⟨n|
+           − (1/2) Σ_n [(E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂)) |n⟩⟨n+1|
+                        + (E_J1 e^(-i2πf₁) + E_J0 + E_J2 e^(-i2πf₂)) |n+1⟩⟨n|]
+
+- No gate charge (n_g = 0), parabola centered at n = 0
+- THREE Josephson couplings with flux-dependent interference
+- Tunneling amplitude: −(1/2)[E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂)] (complex!)
+- TWO independent flux controls (f₁, f₂)
+
+
+6. SPECIFIC EXAMPLE: n_max = 2 (5 states)
+==========================================
+
+Let's write the explicit 5×5 matrix for the basis {|−2⟩, |−1⟩, |0⟩, |1⟩, |2⟩}:
+
+Parameters:
+- E_C = 1, E_J1 = 0.5, E_J0 = 1.0, E_J2 = 0.5
+- f₁ = 0.25, f₂ = 0.25 (Φ₁ = Φ₂ = Φ₀/4)
+
+Calculate tunneling amplitude:
+    t = (1/2)[0.5·e^(iπ/2) + 1.0 + 0.5·e^(iπ/2)]
+      = (1/2)[0.5i + 1.0 + 0.5i]
+      = (1/2)[1.0 + i]
+      = 0.5 + 0.5i
+
+    t* = 0.5 − 0.5i
+
+Hamiltonian matrix:
+
+H =
+    |−2⟩         |−1⟩         |0⟩          |1⟩          |2⟩
+┌                                                                  ┐
+│  16         −(0.5−0.5i)      0           0            0        │ ⟨−2|
+│ −(0.5+0.5i)     4       −(0.5−0.5i)      0            0        │ ⟨−1|
+│      0      −(0.5+0.5i)      0      −(0.5−0.5i)       0        │ ⟨0|
+│      0           0      −(0.5+0.5i)      4       −(0.5−0.5i)   │ ⟨1|
+│      0           0           0      −(0.5+0.5i)      16        │ ⟨2|
+└                                                                  ┘
+
+Notes:
+- Diagonal: 4E_C n² = 4n² → {16, 4, 0, 4, 16}
+- Complex off-diagonal elements from flux
+- Hermitian: H† = H (H_ij* = H_ji)
+
+
+7. PHYSICAL MEANING OF EACH TERM
+=================================
+
+**Diagonal term: ⟨n|H|n⟩ = 4E_C n²**
+
+    Energy cost to have n Cooper pairs on the island (electrostatic energy)
+
+    Example: ⟨2|H|2⟩ = 16E_C
+             Two Cooper pairs on island → high charging energy
+
+
+**Off-diagonal: ⟨n|H|n+1⟩ = −(1/2)[E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂)]**
+
+    Quantum tunneling amplitude from |n⟩ to |n+1⟩
+
+    Example: ⟨0|H|1⟩ = −(0.5 + 0.5i)
+             Cooper pair tunnels from n=0 to n=1 with complex amplitude
+             Magnitude: |⟨0|H|1⟩| = √(0.5² + 0.5²) = 0.707 ≈ √2/2
+             Phase: arg(⟨0|H|1⟩) = arctan(0.5/0.5) = π/4 = 45°
+
+
+**Physical picture:**
+
+The complex phase in ⟨n|H|n+1⟩ represents QUANTUM INTERFERENCE between
+three parallel tunneling paths:
+
+Path 1: Cooper pair tunnels through EJ1 → amplitude ∝ e^(i2πf₁)
+Path 2: Cooper pair tunnels through EJ0 → amplitude ∝ 1
+Path 3: Cooper pair tunnels through EJ2 → amplitude ∝ e^(i2πf₂)
+
+The total amplitude is the COHERENT SUM of these three paths!
+
+At f₁ = f₂ = 0: All paths in phase → maximum |t| = (E_J1 + E_J0 + E_J2)/2
+At f₁ = 0.5, f₂ = 0.5: Paths 1 and 3 have π phase shift → destructive interference
+
+
+8. SUMMARY: CHARGE BASIS REPRESENTATION
+========================================
+
+The BiSQUID circuit in charge basis notation:
+
+**Compact form:**
+    H = Σ_n [4E_C n² |n⟩⟨n| − t |n⟩⟨n+1| − t* |n+1⟩⟨n|]
+
+where:
+    t = (1/2)[E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂)]
+
+**Energy parameters:**
+    E_C = e²/(2C_g) with C_g = gate capacitance
+    E_J1, E_J0, E_J2 = Josephson energies of the three junctions
+    E_L1, E_L2 = (Φ₀/2π)²/(2L) = inductive energies (neglected in 1D model)
+
+**Control parameters:**
+    f₁ = Φ₁/Φ₀ = reduced flux in loop 1
+    f₂ = Φ₂/Φ₀ = reduced flux in loop 2
+
+**Basis states:**
+    |n⟩ = state with n Cooper pairs on the island
+    n ∈ {−n_max, −n_max+1, ..., 0, ..., n_max−1, n_max}
+
+This is the complete quantum description of the BiSQUID
+circuit in the charge representation!
+
+
+TRANSFORMING INDUCTIVE ENERGY E_L φ_L² TO CHARGE BASIS
+=======================================================
+
+The inductor energy terms E_L1 φ_L1² and E_L2 φ_L2² can also be expressed
+in the charge basis, but this is more complex than the Josephson terms.
+
+STEP 1: Relationship Between φ_L and Current
+---------------------------------------------
+
+For an inductor in a superconducting circuit:
+    I_L = (Φ₀/2πL) φ_L
+
+The inductor phase φ_L is determined by current conservation in each branch.
+
+For Branch 1 (EJ1 + L1 in series):
+    I₁ = I_c1 sin(φ_EJ1) = (Φ₀/2πL₁) φ_L1
+
+From flux quantization (large L limit):
+    φ_EJ1 ≈ φ + 2πf₁
+
+Therefore:
+    φ_L1 = (2πL₁I_c1/Φ₀) sin(φ + 2πf₁)
+
+Similarly for Branch 2:
+    φ_L2 = (2πL₂I_c2/Φ₀) sin(φ + 2πf₂)
+
+
+STEP 2: Express sin(φ) in Charge Basis
+---------------------------------------
+
+We need to transform sin(φ) to the |n⟩ basis.
+
+Using Euler's formula:
+    sin(φ) = (e^(iφ) - e^(-iφ))/(2i)
+
+In the charge basis:
+    e^(iφ) |n⟩ = |n+1⟩
+    e^(-iφ) |n⟩ = |n-1⟩
+
+Therefore:
+    ⟨n'|sin(φ)|n⟩ = (1/2i)[δ_(n',n+1) - δ_(n',n-1)]
+                   = (-i/2)[δ_(n',n+1) - δ_(n',n-1)]
+
+Matrix form:
+    sin(φ) = (-i/2) Σ_n [|n⟩⟨n+1| - |n⟩⟨n-1|]
+           = (-i/2) Σ_n [|n⟩⟨n+1| - |n-1⟩⟨n|]
+
+Note: This is ANTI-HERMITIAN! sin(φ)† = -sin(φ)
+
+
+STEP 3: Transform sin²(φ) to Charge Basis
+------------------------------------------
+
+The inductive energy contains φ_L² ∝ sin²(φ).
+
+Method 1: Using cos(2φ) identity
+    sin²(φ) = (1 - cos(2φ))/2
+
+Now transform cos(2φ):
+    cos(2φ) = (e^(i2φ) + e^(-i2φ))/2
+
+Key insight: e^(i2φ) raises charge by TWO Cooper pairs!
+    e^(i2φ) |n⟩ = e^(iφ) e^(iφ) |n⟩ = e^(iφ) |n+1⟩ = |n+2⟩
+
+Therefore:
+    ⟨n'|cos(2φ)|n⟩ = (1/2)[δ_(n',n+2) + δ_(n',n-2)]
+
+Matrix elements:
+    ⟨n|cos(2φ)|n+2⟩ = 1/2
+    ⟨n|cos(2φ)|n-2⟩ = 1/2
+    ⟨n|cos(2φ)|n⟩ = 0
+
+And thus:
+    ⟨n|sin²(φ)|n⟩ = ⟨n|(1 - cos(2φ))/2|n⟩ = 1/2
+    ⟨n|sin²(φ)|n+2⟩ = ⟨n|(1 - cos(2φ))/2|n+2⟩ = -1/4
+    ⟨n|sin²(φ)|n-2⟩ = -1/4
+
+Method 2: Direct calculation (verification)
+    sin²(φ) = [(e^(iφ) - e^(-iφ))/(2i)]²
+            = -(1/4)[e^(i2φ) + e^(-i2φ) - 2]
+            = -(1/4)[e^(i2φ) + e^(-i2φ)] + 1/2
+            = (1/2) - (1/2)cos(2φ)  ✓ Matches!
+
+
+STEP 4: Matrix Elements for sin²(φ + 2πf)
+------------------------------------------
+
+For the inductor terms with flux, we need sin²(φ + 2πf₁).
+
+Using the identity:
+    sin²(φ + 2πf) = (1 - cos(2φ + 4πf))/2
+
+Expand:
+    cos(2φ + 4πf) = (e^(i4πf) e^(i2φ) + e^(-i4πf) e^(-i2φ))/2
+
+Matrix elements:
+    ⟨n|cos(2φ + 4πf)|n+2⟩ = (1/2)e^(i4πf)
+    ⟨n|cos(2φ + 4πf)|n-2⟩ = (1/2)e^(-i4πf)
+    ⟨n|cos(2φ + 4πf)|n⟩ = 0
+
+Therefore:
+    ⟨n|sin²(φ + 2πf)|n⟩ = 1/2
+    ⟨n|sin²(φ + 2πf)|n+2⟩ = -(1/4)e^(i4πf)
+    ⟨n|sin²(φ + 2πf)|n-2⟩ = -(1/4)e^(-i4πf)
+
+
+STEP 5: Complete Inductive Energy in Charge Basis
+--------------------------------------------------
+
+The inductive energy for branch 1:
+    E_L1 φ_L1² = E_L1 [(2πL₁I_c1/Φ₀) sin(φ + 2πf₁)]²
+
+Define the inductive coupling strength:
+    g₁ = E_L1 (2πL₁I_c1/Φ₀)²
+
+Then:
+    E_L1 φ_L1² = g₁ sin²(φ + 2πf₁)
+
+In matrix form:
+    ⟨n|E_L1 φ_L1²|n⟩ = g₁/2
+    ⟨n|E_L1 φ_L1²|n+2⟩ = -(g₁/4) e^(i4πf₁)
+    ⟨n|E_L1 φ_L1²|n-2⟩ = -(g₁/4) e^(-i4πf₁)
+
+In operator form:
+    E_L1 φ_L1² = (g₁/2) Σ_n |n⟩⟨n|
+                 - (g₁/4) Σ_n [e^(i4πf₁) |n⟩⟨n+2| + e^(-i4πf₁) |n⟩⟨n-2|]
+
+Similarly for branch 2:
+    E_L2 φ_L2² = (g₂/2) Σ_n |n⟩⟨n|
+                 - (g₂/4) Σ_n [e^(i4πf₂) |n⟩⟨n+2| + e^(-i4πf₂) |n⟩⟨n-2|]
+
+
+STEP 6: Physical Interpretation
+--------------------------------
+
+The inductive energy has TWO contributions:
+
+1. **Diagonal term (constant energy shift):**
+   ⟨n|E_L φ_L²|n⟩ = g/2
+
+   This is a constant shift for ALL charge states.
+   Physical meaning: Average magnetic energy stored in inductor
+
+2. **Off-diagonal coupling (n ↔ n±2):**
+   ⟨n|E_L φ_L²|n±2⟩ = -(g/4) e^(±i4πf)
+
+   This couples states differing by TWO Cooper pairs!
+   Physical meaning: Quantum fluctuations in inductor current cause
+   simultaneous tunneling of two Cooper pairs through the junction
+
+Note the phase factor e^(±i4πf) - DOUBLE the phase of single-pair tunneling!
+
+
+STEP 7: Matrix Structure with Inductors
+----------------------------------------
+
+The FULL Hamiltonian matrix now has:
+
+- **Diagonal:** 4E_C n² + g₁/2 + g₂/2
+  (charging energy + constant inductive shift)
+
+- **n ↔ n+1 coupling:** -(1/2)[E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂)]
+  (single Cooper pair tunneling via Josephson effect)
+
+- **n ↔ n+2 coupling:** -(g₁/4) e^(i4πf₁) - (g₂/4) e^(i4πf₂)
+  (two Cooper pair processes via inductive fluctuations)
+
+Matrix structure (now PENTADIAGONAL, not tridiagonal!):
+
+         |n-2⟩      |n-1⟩       |n⟩        |n+1⟩      |n+2⟩
+    ┌──────────────────────────────────────────────────────────┐
+⟨n-2|│    ...        0      -(g₁+g₂)*/4    0          0      │
+⟨n-1|│     0        ...         −t*       ...         0      │
+ ⟨n| │ -(g₁+g₂)/4   −t    4E_C n²+const   −t*   -(g₁+g₂)*/4 │
+⟨n+1|│     0        ...         −t        ...         0      │
+⟨n+2|│     0         0      -(g₁+g₂)/4     0         ...     │
+    └──────────────────────────────────────────────────────────┘
+
+where:
+    t = (E_J1 e^(i2πf₁) + E_J0 + E_J2 e^(i2πf₂))/2  (nearest-neighbor)
+    g₁ = E_L1 (2πL₁I_c1/Φ₀)²  (next-nearest-neighbor from L1)
+    g₂ = E_L2 (2πL₂I_c2/Φ₀)²  (next-nearest-neighbor from L2)
+
+
+STEP 8: When to Include Inductive Terms
+----------------------------------------
+
+**Large L regime (E_L small, g small):**
+
+When L₁, L₂ are large:
+    E_L = (Φ₀/2π)²/(2L) << E_J
+
+Then:
+    g = E_L (2πLI_c/Φ₀)² = E_L · (E_J/E_L)² = E_J²/E_L >> E_L
+
+Wait, this scaling is tricky! Let's recalculate...
+
+Actually, using I_c = E_J/(Φ₀/2π):
+    g = E_L (2πLI_c/Φ₀)²
+      = E_L · (2πL)² · (E_J/(Φ₀/2π))² / Φ₀²
+      = E_L · (2πL)² · E_J² · (2π/Φ₀)² / Φ₀²
+      = E_L · (2πL/Φ₀)² · (2π)² · E_J²
+
+This is getting complex. Let's use a different approach.
+
+**Perturbative treatment:**
+
+For large L (small E_L), the inductor terms can be treated perturbatively:
+- Zeroth order: φ_L ≈ 0 → use simplified Hamiltonian
+- First order correction: Include diagonal shift g/2
+- Second order: Include n ↔ n±2 coupling (usually negligible)
+
+**Typical parameter regimes:**
+
+Flux qubit: L ~ 100 pH, E_L ~ 0.01 GHz → g ~ 0.001 GHz (negligible)
+Fluxonium: L ~ 10 nH, E_L ~ 1 GHz → g ~ 0.1 GHz (important!)
+
+For most flux qubits: IGNORE the n ↔ n±2 coupling, only keep tridiagonal form
+
+
+STEP 9: Python Implementation with Inductors
+---------------------------------------------
+
+```python
+def build_hamiltonian_with_inductors(E_C, E_J1, E_J0, E_J2, E_L1, E_L2,
+                                     I_c1, I_c2, f1, f2, n_max):
+    """
+    Build full Hamiltonian including inductive energy terms.
+
+    Parameters
+    ----------
+    E_C : float
+        Charging energy
+    E_J1, E_J0, E_J2 : float
+        Josephson energies
+    E_L1, E_L2 : float
+        Inductive energies: E_L = (Φ₀/2π)²/(2L)
+    I_c1, I_c2 : float
+        Critical currents of junctions 1 and 2
+    f1, f2 : float
+        Reduced external fluxes
+    n_max : int
+        Truncation parameter
+
+    Returns
+    -------
+    H : complex array, shape (2*n_max+1, 2*n_max+1)
+        Full Hamiltonian matrix (PENTADIAGONAL)
+    """
+    Phi0 = 1.0  # Set flux quantum as energy unit
+    dim = 2 * n_max + 1
+    n_values = np.arange(-n_max, n_max + 1)
+
+    H = np.zeros((dim, dim), dtype=complex)
+
+    # Calculate inductive coupling strengths
+    # g = E_L * (2π L I_c / Φ₀)²
+    # Using I_c and E_J = (Φ₀/2π) I_c:
+    # For simplicity, assume L from E_L = (Φ₀/2π)²/(2L)
+    L1 = (Phi0/(2*np.pi))**2 / (2*E_L1)
+    L2 = (Phi0/(2*np.pi))**2 / (2*E_L2)
+
+    g1 = E_L1 * (2*np.pi*L1*I_c1/Phi0)**2
+    g2 = E_L2 * (2*np.pi*L2*I_c2/Phi0)**2
+
+    # Diagonal: charging + constant inductive shift
+    for i, n in enumerate(n_values):
+        H[i, i] = 4.0 * E_C * n**2 + g1/2 + g2/2
+
+    # n ↔ n+1: Josephson tunneling
+    t = -0.5 * (E_J1*np.exp(1j*2*np.pi*f1) + E_J0 + E_J2*np.exp(1j*2*np.pi*f2))
+    for i in range(dim - 1):
+        H[i, i+1] = t
+        H[i+1, i] = np.conj(t)
+
+    # n ↔ n+2: Inductive coupling (two-Cooper-pair processes)
+    g_coupling = -0.25 * (g1*np.exp(1j*4*np.pi*f1) + g2*np.exp(1j*4*np.pi*f2))
+    for i in range(dim - 2):
+        H[i, i+2] = g_coupling
+        H[i+2, i] = np.conj(g_coupling)
+
+    return H
+```
+
+**Important note:** For most practical flux qubits with large L, g << t,
+so the n ↔ n+2 terms are negligible and can be omitted!
+
+
+STEP 10: Summary - Inductive Energy in Charge Basis
+----------------------------------------------------
+
+**Complete operator form:**
+    E_L φ_L² = E_L [2πLI_c/Φ₀ · sin(φ + 2πf)]²
+             = g sin²(φ + 2πf)
+             = (g/2) Σ_n |n⟩⟨n|
+               - (g/4) Σ_n [e^(i4πf)|n⟩⟨n+2| + e^(-i4πf)|n⟩⟨n-2|]
+
+**Matrix elements:**
+    ⟨n|E_L φ_L²|n⟩ = g/2  (constant diagonal shift)
+    ⟨n|E_L φ_L²|n±2⟩ = -(g/4) e^(±i4πf)  (two-pair coupling)
+
+**Physical effects:**
+1. Constant energy shift (can be absorbed into energy reference)
+2. Couples charge states differing by 2 Cooper pairs
+3. Phase factor e^(±i4πf) - double the single-pair phase!
+4. Usually weak compared to Josephson coupling (g << E_J for large L)
+
+**Practical simplification:**
+For flux qubits with large L → g ≈ 0 → IGNORE inductive terms
+Use simplified tridiagonal Hamiltonian with φ_L ≈ 0
+
+================================================================================

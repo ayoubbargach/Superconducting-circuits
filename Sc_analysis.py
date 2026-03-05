@@ -21,11 +21,11 @@ CIRCUITS = {
         'module': 'Cooper_box',
         'function': 'analyze_cooper_box'
     },
-    'triple_josephson': {
-        'name': 'Triple Josephson Junction',
+    'bisquid': {
+        'name': 'BiSQUID',
         'description': 'Energy levels vs two external fluxes for (EJ1+L1)||EJ0||(EJ2+L2) circuit',
-        'module': 'Triple_josephson',
-        'function': 'analyze_triple_josephson'
+        'module': 'BiSQUID',
+        'function': 'analyze_bisquid'
     },
     # Add more circuits here as you implement them
     # 'flux_qubit': {

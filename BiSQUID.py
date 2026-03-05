@@ -19,7 +19,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import os
-from circuit_diagram_triple_josephson import draw_circuit
+from circuit_diagram_bisquid import draw_circuit
 
 # Physical constants
 PHI_0 = 2.067833848e-15  # Flux quantum in Wb (h/2e)
@@ -206,7 +206,7 @@ def compute_spectrum_2D(f1_array, f2_array, n_levels=10, n_max=30):
     return energies
 
 
-def analyze_triple_josephson(results_dir='Results_Triple_Josephson'):
+def analyze_bisquid(results_dir='Results_BiSQUID'):
     """
     Main analysis function for triple Josephson junction circuit.
 
@@ -439,4 +439,4 @@ def analyze_triple_josephson(results_dir='Results_Triple_Josephson'):
 
 
 if __name__ == '__main__':
-    analyze_triple_josephson()
+    analyze_bisquid()

@@ -14,11 +14,11 @@ except ImportError:
     print("Warning: schemdraw not available, circuit diagram will be skipped")
 
 
-def draw_circuit(results_dir='Results_Triple_Josephson'):
+def draw_circuit(results_dir='Results_BiSQUID'):
     """
     Draw the triple Josephson junction circuit diagram.
 
-    Circuit: Cg + (EJ1 + L1) || EJ0 || (EJ2 + L2)
+    Circuit: Cg + ((EJ1 || C1) + L1) || (EJ0 || C0) || ((EJ2 || C2) + L2)
 
     Parameters
     ----------
@@ -42,35 +42,77 @@ def draw_circuit(results_dir='Results_Triple_Josephson'):
             d.config(fontsize=12)
 
             # Gate capacitor Cg
-            d += elm.Line().up().length(0.5)
+            d += elm.Line().up().length(1)
             d += elm.Capacitor().up().label('$C_g$')
             d += elm.Line().right()
 
             # Save the top node position (start of parallel branches)
             d += (top := elm.Dot())
 
-            # Branch 1: EJ1 + L1 (series)
-            d += (ej1 := elm.Josephson().down().label('$E_{J1}$'))
+            # Branch 1: (EJ1 || C1) + L1 (series)
+            # First, create a mini-parallel of EJ1 || C1
+            d += elm.Line().down().length(0.3)
+            d += (branch1_top := elm.Dot())
+
+            # EJ1
+            d += (ej1 := elm.Josephson().down().label('$E_{J1}$', loc='left'))
+            d += (branch1_bottom := elm.Dot())
+
+            # C1 in parallel with EJ1
+            d.move_from(branch1_top.start)
+            d += elm.Line().left().length(0.8)
+            d += elm.Capacitor().down().label('$C_1$', loc='left')
+            d += elm.Line().to(branch1_bottom.start)
+
+            # Continue with L1
+            d.move_from(branch1_bottom.start)
             d += (l1 := elm.Inductor().right().label('$L_1$'))
             d += (bottom_left := elm.Dot())
 
-            # Branch 2: EJ0 (center branch)
+            # Branch 2: EJ0 || C0 (center branch)
             d.move_from(top.start)
             d += elm.Line().right().length(3)
-            d += (ej0 := elm.Josephson().down().label('$E_{J0}$'))
+            d += elm.Line().down().length(0.3)
+            d += (branch2_top := elm.Dot())
+
+            # EJ0
+            d += (ej0 := elm.Josephson().down().label('$E_{J0}$', loc='left'))
+            d += (branch2_bottom := elm.Dot())
+
+            # C0 in parallel with EJ0
+            d.move_from(branch2_top.start)
+            d += elm.Line().left().length(0.8)
+            d += elm.Capacitor().down().label('$C_0$', loc='left')
+            d += elm.Line().to(branch2_bottom.start)
+
+            # Use branch2_bottom as the main bottom junction point
+            d.move_from(branch2_bottom.start)
             d += (bottom_center := elm.Dot())
 
-            # Branch 3: EJ2 + L2 (series)
+            # Branch 3: (EJ2 || C2) + L2 (series)
             d.move_from(top.start)
             d += elm.Line().right().length(6)
-            d += (ej2 := elm.Josephson().down().label('$E_{J2}$'))
-            d += (l2 := elm.Inductor().left().label('$L_2$'))
-            d += (bottom_right := elm.Dot())
+            d += elm.Line().down().length(0.3)
+            d += (branch3_top := elm.Dot())
 
-            # Connect all bottoms together
+            # EJ2
+            d += (ej2 := elm.Josephson().down().label('$E_{J2}$', loc='left'))
+            d += (branch3_bottom := elm.Dot())
+
+            # C2 in parallel with EJ2
+            d.move_from(branch3_top.start)
+            d += elm.Line().left().length(0.8)
+            d += elm.Capacitor().down().label('$C_2$', loc='left')
+            d += elm.Line().to(branch3_bottom.start)
+
+            # Continue with L2 - connect directly to bottom_center
+            d.move_from(branch3_bottom.start)
+            d += (l2 := elm.Inductor().left().label('$L_2$'))
             d += elm.Line().to(bottom_center.start)
-            d.move_from(bottom_center.start)
-            d += elm.Line().to(bottom_left.start)
+
+            # Connect bottom_left to bottom_center
+            d.move_from(bottom_left.start)
+            d += elm.Line().to(bottom_center.start)
 
             # Add flux indicator for left loop (EJ1-L1 || EJ0)
             # Draw a circular arrow in the middle of the left loop

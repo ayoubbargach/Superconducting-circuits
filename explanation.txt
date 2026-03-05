@@ -1,0 +1,161 @@
+================================================================================
+COOPER PAIR BOX ENERGY LEVEL CALCULATIONS - STEP-BY-STEP EXPLANATION
+================================================================================
+
+OVERVIEW
+--------
+The code calculates quantum energy levels of a Cooper-pair box (superconducting
+qubit) by numerically diagonalizing its Hamiltonian matrix.
+
+
+STEP-BY-STEP CALCULATION PROCESS
+=================================
+
+1. BUILD THE HAMILTONIAN MATRIX (Lines 18-47)
+----------------------------------------------
+
+The Hamiltonian in the charge basis is:
+    H = 4·Ec·Σ(n - ng)²|n⟩⟨n| - (EJ/2)·Σ(|n⟩⟨n+1| + |n+1⟩⟨n|)
+
+Line 37-38: Create charge number basis
+    dim = 2 * n_max + 1  # Matrix dimension (e.g., n_max=30 → 61×61 matrix)
+    n_values = np.arange(-n_max, n_max + 1)
+    # Charge states: [-30, -29, ..., 0, ..., 29, 30]
+
+Line 41: Calculate diagonal elements (charging energy)
+    diag = 4.0 * (n_values - n_g) ** 2
+
+    - Each diagonal element represents the charging energy of state |n⟩
+    - n_g is the gate charge (offset), shifts energy parabola
+    - With Ec = 1 (units), this gives 4(n - ng)²
+
+Line 44: Calculate off-diagonal elements (Josephson coupling)
+    off_diag = -EJ_over_EC / 2.0 * np.ones(dim - 1)
+
+    - Represents quantum tunneling of Cooper pairs between adjacent charge states
+    - Couples |n⟩ to |n+1⟩ and |n-1⟩
+    - Strength proportional to EJ/EC ratio
+
+Line 46: Assemble tridiagonal matrix
+    H = np.diag(diag) + np.diag(off_diag, 1) + np.diag(off_diag, -1)
+
+    - Main diagonal: charging energies
+    - Upper/lower diagonals: tunneling couplings
+    - Creates symmetric tridiagonal matrix
+
+
+2. COMPUTE ENERGY SPECTRUM (Lines 50-75)
+-----------------------------------------
+
+Line 59-62: Loop over gate charge values
+    for i, n_g in enumerate(n_g_array):  # n_g from -2 to 2
+        H = build_hamiltonian(n_g, EJ_over_EC, n_max)
+        evals = np.linalg.eigvalsh(H)  # Diagonalize Hamiltonian
+        energies[i, :] = evals[:n_levels]  # Keep lowest 7 levels
+
+    - For each n_g value, build the Hamiltonian
+    - eigvalsh() finds eigenvalues (energy levels) of symmetric matrix
+    - Eigenvalues are automatically sorted from lowest to highest
+    - Store only the lowest 7 energy levels
+
+Line 65: Shift ground state to zero
+    energies -= energies[:, 0].min()
+
+    - Subtract minimum ground state energy
+    - Makes ground state energy = 0 at the lowest point
+
+Line 69-73: Normalize by qubit transition frequency
+    idx_half = np.argmin(np.abs(n_g_array - 0.5))  # Find n_g ≈ 0.5
+    E01 = energies[idx_half, 1] - energies[idx_half, 0]
+    # Gap between levels 0 and 1
+    if E01 > 1e-10:
+        energies /= E01  # Normalize all energies
+
+    - Find the 0→1 transition energy at n_g = 0.5
+    - Divide all energies by this value
+    - Y-axis now shows "Energy / E₀₁" (normalized units)
+
+
+3. GENERATE PLOTS FOR DIFFERENT REGIMES (Lines 98-114)
+-------------------------------------------------------
+
+Line 83: Four different EJ/EC ratios
+    EJ_EC_values = [0.01, 1.0, 3.0, 10.0]
+
+For each ratio:
+
+(a) EJ/EC = 0.01 (Charge regime)
+    - Charging energy dominates
+    - Energy levels strongly dependent on n_g
+    - Large energy gaps between levels
+
+(b) EJ/EC = 1.0 (Intermediate)
+    - Comparable charging and Josephson energies
+    - Moderate n_g dependence
+
+(c) EJ/EC = 3.0 (Transmon-like)
+    - Josephson energy becoming dominant
+    - Reduced n_g sensitivity
+
+(d) EJ/EC = 10.0 (Transmon regime)
+    - Nearly n_g-independent (flat lines)
+    - Small anharmonicity
+    - Top energy levels exceed y-axis limit (0-5)
+
+Line 102: Adjust convergence
+    n_max = 10 if EJ_EC < 5 else 30
+
+    - Small EJ/EC: fewer charge states needed (10×10 matrix)
+    - Large EJ/EC: more charge states for convergence (30×30 matrix)
+
+Line 104-107: Compute and plot
+    energies = compute_spectrum(n_g_array, EJ_EC, n_levels, n_max)
+    for level in range(n_levels):
+        ax.plot(n_g_array, energies[:, level], color=colors[level], lw=1.5)
+
+    - Calculate 7 energy levels vs. gate charge
+    - Plot each level with different color
+
+
+PHYSICAL INTERPRETATION
+========================
+
+The calculation shows the quantum mechanical competition between:
+
+- CHARGING ENERGY (Ec): Favors definite Cooper pair number
+- JOSEPHSON ENERGY (EJ): Favors quantum superposition of charge states
+
+As EJ/EC increases, the system transitions from charge qubit → transmon,
+becoming less sensitive to charge noise (flatter energy curves).
+
+
+KEY EQUATIONS
+=============
+
+Hamiltonian Matrix Elements:
+    H_nn = 4·Ec·(n - ng)²                    (diagonal)
+    H_n,n+1 = H_n+1,n = -EJ/2                (off-diagonal)
+
+Energy Normalization:
+    E_normalized = E / E_01(ng=0.5)
+
+Charge State Basis:
+    |ψ⟩ = Σ c_n |n⟩   where n = -n_max, ..., +n_max
+
+
+NUMERICAL DETAILS
+=================
+
+Matrix Size:
+    - Dimension = 2·n_max + 1
+    - n_max = 10 for EJ/EC < 5
+    - n_max = 30 for EJ/EC ≥ 5
+
+Gate Charge Range:
+    - n_g ∈ [-2, 2]
+    - 500 points
+
+Energy Levels:
+    - 7 levels calculated
+    - Y-axis fixed at [0, 5] in normalized units
+    - Higher levels may not appear in charge regime
