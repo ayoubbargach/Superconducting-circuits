@@ -3,9 +3,9 @@
 
 # Results directories (exclude from git)
 Results_Triple_Josephson/
-Results_BiSQUID/
 
-# Exception: Include full quantum results
+# Exception: Include BiSQUID results
+!Results_BiSQUID/
 !Results_BiSQUID_FullQuantum/
 
 # Python cache
