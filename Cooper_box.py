@@ -159,14 +159,14 @@ def analyze_cooper_box(results_dir='Results_Cooper_box'):
     print(f"Figure saved: {results_dir}/figure.png")
     plt.close()
 
-    # ---------- Plot 2: 10 different Ej/Ec ratios with fixed truncation ----------
+    # ---------- Plot 2: 4 different Ej/Ec ratios with fixed truncation ----------
     print("\nGenerating EJ/EC range plots...")
-    EJ_EC_range = np.logspace(np.log10(0.1), np.log10(9.9), 10)
+    EJ_EC_range = np.logspace(np.log10(0.1), np.log10(9.9), 4)
     n_max_fixed = 30
     n_levels_range = 30  # Show all 30 levels
 
-    fig_range = plt.figure(figsize=(15, 12))
-    gs_range = GridSpec(2, 5, hspace=0.35, wspace=0.3)
+    fig_range = plt.figure(figsize=(12, 8))
+    gs_range = GridSpec(2, 2, hspace=0.35, wspace=0.3)
 
     for idx, EJ_EC in enumerate(EJ_EC_range):
         ax = fig_range.add_subplot(gs_range[idx])
