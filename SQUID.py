@@ -38,18 +38,18 @@ except ImportError:
     print("Warning: scipy.special.mathieu functions not available")
 
 
-def build_hamiltonian_phase_basis(phi_ext, EJ_over_EC, n_max=50):
+def build_hamiltonian_phase_basis(phi_ext, EJ_over_EC, n_max=50, n_g=0.5):
     """
-    Build SQUID Hamiltonian in phase momentum basis |n⟩ with truncation.
+    Build SQUID Hamiltonian in phase momentum basis |n⟩ with truncation and gate charge.
 
     In the phase representation, we use momentum eigenstates where:
-        H = 4*E_C*n^2 - E_eff*cos(φ_ext - φ)
+        H = 4*E_C*(n - n_g)^2 - E_eff*cos(φ_ext - φ)
 
     Matrix elements in phase momentum basis |n⟩:
-        ⟨n|H|m⟩ = 4*E_C*n^2 δ_nm - (E_eff/2)[e^(i*φ_ext)δ_{n,m-1} + e^(-i*φ_ext)δ_{n,m+1}]
+        ⟨n|H|m⟩ = 4*E_C*(n - n_g)^2 δ_nm - (E_eff/2)[e^(i*φ_ext)δ_{n,m-1} + e^(-i*φ_ext)δ_{n,m+1}]
 
     This gives a tridiagonal Hermitian matrix:
-        - Diagonal: 4*E_C*n^2 (kinetic energy in phase space)
+        - Diagonal: 4*E_C*(n - n_g)^2 (charging energy with gate charge offset)
         - Off-diagonal: -(E_J/2)*e^(±iφ_ext) (Josephson potential with flux modulation)
 
     The eigenstates are related to Mathieu functions with periodic boundary conditions.
@@ -62,6 +62,8 @@ def build_hamiltonian_phase_basis(phi_ext, EJ_over_EC, n_max=50):
         Ratio E_J/E_C (E_eff = E_J for symmetric SQUID)
     n_max : int
         Truncation: phase momentum from -n_max to n_max
+    n_g : float
+        Gate charge (in units of 2e), default 0.5 for charge degeneracy point
 
     Returns
     -------
@@ -74,21 +76,26 @@ def build_hamiltonian_phase_basis(phi_ext, EJ_over_EC, n_max=50):
     # Basis states: |n⟩ with n ∈ [-n_max, ..., 0, ..., n_max]
     n_values = np.arange(-n_max, n_max + 1)
 
-    for i, n in enumerate(n_values):
-        # Diagonal: kinetic energy 4*E_C*n^2
-        H[i, i] = 4.0 * n**2
+    # For a DC SQUID with two junctions, the effective Josephson energy is flux-dependent:
+    # E_J_eff(φ_ext) = 2*E_J*|cos(φ_ext/2)|
+    # where EJ_over_EC here represents E_J/E_C per junction
+    EJ_eff = 2.0 * EJ_over_EC * np.abs(np.cos(phi_ext / 2.0))
 
-        # Off-diagonal: Josephson coupling -E_J*cos(φ_ext - φ)
-        # In momentum basis: -E_J/2 * [e^(i*φ_ext)|n-1⟩ + e^(-i*φ_ext)|n+1⟩]
+    for i, n in enumerate(n_values):
+        # Diagonal: charging energy 4*E_C*(n - n_g)^2
+        H[i, i] = 4.0 * (n - n_g)**2
+
+        # Off-diagonal: Josephson coupling with flux-modulated amplitude
+        # -E_J_eff*cos(φ) → -E_J_eff/2 * [|n-1⟩ + |n+1⟩] in momentum basis
         if i > 0:  # n-1 exists
-            H[i, i-1] = -EJ_over_EC / 2.0 * np.exp(1j * phi_ext)
+            H[i, i-1] = -EJ_eff / 2.0
         if i < dim - 1:  # n+1 exists
-            H[i, i+1] = -EJ_over_EC / 2.0 * np.exp(-1j * phi_ext)
+            H[i, i+1] = -EJ_eff / 2.0
 
     return H
 
 
-def compute_spectrum(phi_ext_array, EJ_over_EC, n_levels=5, n_max=50):
+def compute_spectrum(phi_ext_array, EJ_over_EC, n_levels=5, n_max=50, n_g=0.5):
     """
     Compute energy spectrum as a function of external flux using numerical diagonalization.
 
@@ -102,6 +109,8 @@ def compute_spectrum(phi_ext_array, EJ_over_EC, n_levels=5, n_max=50):
         Number of energy levels to compute
     n_max : int
         Phase momentum truncation (n ∈ [-n_max, n_max])
+    n_g : float
+        Gate charge offset in units of 2e (default: 0.5)
 
     Returns
     -------
@@ -114,7 +123,7 @@ def compute_spectrum(phi_ext_array, EJ_over_EC, n_levels=5, n_max=50):
     energies = np.zeros((len(phi_ext_array), n_levels_actual))
 
     for i, phi_ext in enumerate(phi_ext_array):
-        H = build_hamiltonian_phase_basis(phi_ext, EJ_over_EC, n_max)
+        H = build_hamiltonian_phase_basis(phi_ext, EJ_over_EC, n_max, n_g)
         evals = np.linalg.eigvalsh(H)
         energies[i, :] = evals[:n_levels_actual].real
 
@@ -263,7 +272,7 @@ def analyze_squid(results_dir='Results_SQUID'):
         ax = fig_spectrum.add_subplot(gs[idx])
 
         print(f"  Computing spectrum for E_J/E_C = {EJ_EC}...")
-        energies = compute_spectrum(phi_ext_array, EJ_EC, n_levels, n_max_default)
+        energies = compute_spectrum(phi_ext_array, EJ_EC, n_levels, n_max_default, n_g=0.5)
 
         # Plot first n_levels energy bands
         for level in range(min(n_levels, energies.shape[1])):
@@ -311,7 +320,7 @@ def analyze_squid(results_dir='Results_SQUID'):
     for EJ_EC in [0.5, 5.0, 20.0]:
         fig_ind, ax_ind = plt.subplots(figsize=(10, 7))
 
-        energies = compute_spectrum(phi_ext_array, EJ_EC, n_levels, n_max_default)
+        energies = compute_spectrum(phi_ext_array, EJ_EC, n_levels, n_max_default, n_g=0.5)
 
         for level in range(min(n_levels, energies.shape[1])):
             ax_ind.plot(f_ext_array, energies[:, level],
@@ -457,7 +466,7 @@ def analyze_squid(results_dir='Results_SQUID'):
     for EJ_EC in EJ_EC_transitions:
         fig_trans, ax_trans = plt.subplots(figsize=(10, 7))
 
-        energies = compute_spectrum(phi_ext_array, EJ_EC, 5, n_max_default)
+        energies = compute_spectrum(phi_ext_array, EJ_EC, 5, n_max_default, n_g=0.5)
 
         # Plot E_01, E_12, E_23
         transitions = [
@@ -492,8 +501,11 @@ def analyze_squid(results_dir='Results_SQUID'):
     # ========================================================================
     # 7. Comparison: Numerical vs Mathieu Functions
     # ========================================================================
+    # NOTE: Mathieu functions are only valid for n_g = 0 (or integer n_g)
+    # For this comparison, we use n_g = 0 for both methods
     if MATHIEU_AVAILABLE:
         print("\nComparing numerical diagonalization vs Mathieu function methods...")
+        print("  (Using n_g = 0 for fair comparison)")
 
         EJ_EC_comparison = [0.5, 2.0, 5.0, 20.0]
 
@@ -505,8 +517,8 @@ def analyze_squid(results_dir='Results_SQUID'):
 
             print(f"  Comparing methods for E_J/E_C = {EJ_EC}...")
 
-            # Compute with both methods
-            energies_numerical = compute_spectrum(phi_ext_array, EJ_EC, 5, n_max_default)
+            # Compute with both methods (using n_g = 0 for valid comparison)
+            energies_numerical = compute_spectrum(phi_ext_array, EJ_EC, 5, n_max_default, n_g=0.0)
             energies_mathieu = compute_spectrum_mathieu(phi_ext_array, EJ_EC, 5)
 
             if energies_mathieu is not None:
@@ -557,7 +569,7 @@ def analyze_squid(results_dir='Results_SQUID'):
 
         fig_side, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
 
-        energies_numerical = compute_spectrum(phi_ext_array, EJ_EC_demo, 5, n_max_default)
+        energies_numerical = compute_spectrum(phi_ext_array, EJ_EC_demo, 5, n_max_default, n_g=0.0)
         energies_mathieu = compute_spectrum_mathieu(phi_ext_array, EJ_EC_demo, 5)
 
         # Left: Numerical

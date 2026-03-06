@@ -39,8 +39,13 @@ def draw_squid_circuit(results_dir='Results_SQUID'):
             with schemdraw.Drawing(show=False) as d:
                 d.config(fontsize=12)
 
-                # Top node
-                d += elm.Line().right().length(0)
+                # Voltage source Vg and gate capacitor Cg at the top
+                d += elm.Ground()
+                d += elm.Line().up().length(1)
+                d += elm.SourceV().up().label('$V_g$')
+                d += elm.Capacitor().right().label('$C_g$')
+
+                # Top node (island)
                 d += (top := elm.Dot())
 
                 # Left branch: J1 (with C1 in parallel)
@@ -60,7 +65,7 @@ def draw_squid_circuit(results_dir='Results_SQUID'):
                 d += elm.Line().down().length(0.3)
                 d += (bottom_left := elm.Dot())
 
-                # Right branch: J2 (with Cg in parallel)
+                # Right branch: J2 (with C2 in parallel)
                 d.move_from(top.start)
                 d += elm.Line().right().length(3)
                 d += elm.Line().down().length(0.3)
@@ -68,10 +73,10 @@ def draw_squid_circuit(results_dir='Results_SQUID'):
                 d += (j2 := elm.Josephson().down().label('$E_{J2}$', loc='left'))
                 d += (j2_bottom := elm.Dot())
 
-                # Capacitor Cg in parallel with J2
+                # Capacitor C2 in parallel with J2
                 d.move_from(j2_top.start)
                 d += elm.Line().left().length(0.8)
-                d += elm.Capacitor().down().label('$C_g$', loc='left')
+                d += elm.Capacitor().down().label('$C_2$', loc='left')
                 d += elm.Line().to(j2_bottom.start)
 
                 # Continue down to bottom on right
