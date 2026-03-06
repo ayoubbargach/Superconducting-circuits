@@ -26,4 +26,4 @@ ENV/
 *.swo
 
 # Claude Code settings
-.claude/settings.json
+.claude/
