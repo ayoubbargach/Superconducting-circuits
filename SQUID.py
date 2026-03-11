@@ -561,45 +561,44 @@ def analyze_squid(results_dir='Results_SQUID'):
         plt.close()
 
         # ====================================================================
-        # 7b. Side-by-side spectrum comparison for one E_J/E_C ratio
+        # 7b. Side-by-side spectrum comparison for multiple E_J/E_C ratios
         # ====================================================================
-        print("\nGenerating side-by-side spectrum comparison...")
+        print("\nGenerating side-by-side spectrum comparisons...")
 
-        EJ_EC_demo = 5.0
+        for EJ_EC_demo in [0.5, 5.0]:
+            fig_side, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
 
-        fig_side, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+            energies_numerical = compute_spectrum(phi_ext_array, EJ_EC_demo, 5, n_max_default, n_g=0.0)
+            energies_mathieu = compute_spectrum_mathieu(phi_ext_array, EJ_EC_demo, 5)
 
-        energies_numerical = compute_spectrum(phi_ext_array, EJ_EC_demo, 5, n_max_default, n_g=0.0)
-        energies_mathieu = compute_spectrum_mathieu(phi_ext_array, EJ_EC_demo, 5)
-
-        # Left: Numerical
-        for level in range(energies_numerical.shape[1]):
-            ax1.plot(f_ext_array, energies_numerical[:, level],
-                    color=colors[level % len(colors)], lw=2.5, label=f'$E_{level}$')
-        ax1.set_xlabel(r'$f_{ext} = \Phi_{ext}/\Phi_0$', fontsize=14)
-        ax1.set_ylabel(r'$E$ (units of $E_C$)', fontsize=14)
-        ax1.set_title(f'Numerical Diagonalization\n$E_J/E_C = {EJ_EC_demo}$', fontsize=14)
-        ax1.grid(True, alpha=0.3)
-        ax1.set_xlim(-0.5, 0.5)
-        ax1.legend(fontsize=11, loc='best')
-
-        # Right: Mathieu
-        if energies_mathieu is not None:
-            for level in range(energies_mathieu.shape[1]):
-                ax2.plot(f_ext_array, energies_mathieu[:, level],
+            # Left: Numerical
+            for level in range(energies_numerical.shape[1]):
+                ax1.plot(f_ext_array, energies_numerical[:, level],
                         color=colors[level % len(colors)], lw=2.5, label=f'$E_{level}$')
-        ax2.set_xlabel(r'$f_{ext} = \Phi_{ext}/\Phi_0$', fontsize=14)
-        ax2.set_ylabel(r'$E$ (units of $E_C$)', fontsize=14)
-        ax2.set_title(f'Mathieu Functions\n$E_J/E_C = {EJ_EC_demo}$', fontsize=14)
-        ax2.grid(True, alpha=0.3)
-        ax2.set_xlim(-0.5, 0.5)
-        ax2.legend(fontsize=11, loc='best')
+            ax1.set_xlabel(r'$f_{ext} = \Phi_{ext}/\Phi_0$', fontsize=14)
+            ax1.set_ylabel(r'$E$ (units of $E_C$)', fontsize=14)
+            ax1.set_title(f'Numerical Diagonalization\n$E_J/E_C = {EJ_EC_demo}$', fontsize=14)
+            ax1.grid(True, alpha=0.3)
+            ax1.set_xlim(-0.5, 0.5)
+            ax1.legend(fontsize=11, loc='best')
 
-        plt.tight_layout()
-        plt.savefig(f'{results_dir}/spectrum_comparison_sidebyside.png',
-                   dpi=200, bbox_inches='tight')
-        print(f"Side-by-side comparison saved: {results_dir}/spectrum_comparison_sidebyside.png")
-        plt.close()
+            # Right: Mathieu
+            if energies_mathieu is not None:
+                for level in range(energies_mathieu.shape[1]):
+                    ax2.plot(f_ext_array, energies_mathieu[:, level],
+                            color=colors[level % len(colors)], lw=2.5, label=f'$E_{level}$')
+            ax2.set_xlabel(r'$f_{ext} = \Phi_{ext}/\Phi_0$', fontsize=14)
+            ax2.set_ylabel(r'$E$ (units of $E_C$)', fontsize=14)
+            ax2.set_title(f'Mathieu Functions\n$E_J/E_C = {EJ_EC_demo}$', fontsize=14)
+            ax2.grid(True, alpha=0.3)
+            ax2.set_xlim(-0.5, 0.5)
+            ax2.legend(fontsize=11, loc='best')
+
+            plt.tight_layout()
+            filename = f'{results_dir}/spectrum_comparison_sidebyside_EJ_EC_{EJ_EC_demo}.png'
+            plt.savefig(filename, dpi=200, bbox_inches='tight')
+            print(f"Side-by-side comparison saved: {filename}")
+            plt.close()
 
     else:
         print("\nMathieu functions not available, skipping comparison.")
